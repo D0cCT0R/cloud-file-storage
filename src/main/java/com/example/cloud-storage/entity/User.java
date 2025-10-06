@@ -1,0 +1,22 @@
+package com.example.cloud_file_storage.entity;
+
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Entity
+@Table(name = "users")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(name = "login")
+    private String login;
+    @Column(name = "password")
+    private String password;
+}
