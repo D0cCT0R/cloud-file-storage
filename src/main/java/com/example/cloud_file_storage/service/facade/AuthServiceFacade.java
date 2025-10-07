@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthServiceFacade {
 
-    private PasswordEncoder passwordEncoder;
-    private UserService userService;
+    private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
 
     @Autowired
     public AuthServiceFacade(UserService userService, PasswordEncoder passwordEncoder) {
