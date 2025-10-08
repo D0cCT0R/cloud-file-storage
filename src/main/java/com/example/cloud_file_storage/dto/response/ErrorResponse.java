@@ -1,6 +1,6 @@
 package com.example.cloud_file_storage.dto.response;
 
-public record SignUpResponse(
-        String username
+public record ErrorResponse(
+        String message
 ) {
 }

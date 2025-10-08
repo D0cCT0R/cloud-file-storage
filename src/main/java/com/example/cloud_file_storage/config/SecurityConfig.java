@@ -3,6 +3,7 @@ package com.example.cloud_file_storage.config;
 
 import com.example.cloud_file_storage.service.core.UserService;
 import jdk.jfr.MemoryAddress;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,8 +22,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 
-
+@Slf4j
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -48,6 +51,11 @@ public class SecurityConfig {
     }
 
     @Bean
+    public SecurityContextRepository securityContextRepository() {
+        return new HttpSessionSecurityContextRepository();
+    }
+
+    @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
@@ -62,15 +70,15 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.
                 authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/css/**", "/js/**", "/images/**", "/api/auth/sign-up", "/api/auth/sign-in").permitAll()
-                                .requestMatchers("/api/**").authenticated()
+                        auth.requestMatchers("/css/**", "/js/**", "/images/**", "/auth/sign-up", "/auth/sign-in").permitAll()
+                                .requestMatchers("/**").authenticated()
                 )
                 .userDetailsService(userDetailsService())
                 .exceptionHandling(exception ->
                         exception.authenticationEntryPoint((request, response, authException) -> {
+                            log.info("Попытка перехода на запрещенный end-point");
                             response.setStatus(HttpStatus.UNAUTHORIZED.value());
                             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-
                             String jsonResponse = """
                                         {"message":"Пользователь не авторизирован"}
                                     """;
