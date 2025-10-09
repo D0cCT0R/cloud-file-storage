@@ -2,3 +2,9 @@
 spring.datasource.url=jdbc:postgresql://localhost:5432/your_database_name
 spring.datasource.username=your_username
 spring.datasource.password=your_password
+
+# MINIO SETTINGS
+minio.url=http://localhost:9000
+minio.access-key=your_root_username
+minio.secret-key=your_root_password
+minio.bucket-name=cloud-storage

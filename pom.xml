@@ -107,6 +107,14 @@
 			<scope>test</scope>
 		</dependency>
 
+        <!-- S3 -->
+
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>8.6.0</version>
+        </dependency>
+
 		<!-- Utility -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
