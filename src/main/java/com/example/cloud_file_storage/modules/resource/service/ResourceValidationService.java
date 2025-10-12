@@ -10,8 +10,11 @@ import org.springframework.stereotype.Service;
 public class ResourceValidationService {
 
     public void validateUserPath(String userPath) throws InvalidPathException {
-        if(userPath == null) {
-            throw new InvalidPathException("Путь не может быть null");
+        if(userPath == null || userPath.isEmpty()) {
+            throw new InvalidPathException("Путь не может быть пустым");
+        }
+        if(userPath.contains("\\")) {
+            throw new InvalidPathException("Путь не может содержать \\");
         }
         if(userPath.contains("//")) {
             throw new InvalidPathException("Неверный формат пути");
