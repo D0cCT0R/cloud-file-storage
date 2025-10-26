@@ -1,7 +1,7 @@
 package com.example.cloud_file_storage.modules.minio.service;
 
 
-import com.example.cloud_file_storage.modules.minio.resource.dto.PathComponents;
+import com.example.cloud_file_storage.modules.minio.dto.PathComponents;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,6 +26,9 @@ public class PathResolverService {
         if(path.endsWith("/")) {
             path = path.substring(0, path.length() - 1);
         }
+        if(path.startsWith("/")) {
+            path = path.substring(1);
+        }
         int lastSlashIndex = path.lastIndexOf('/');
         if (lastSlashIndex == -1) {
             return new PathComponents("/", path);
@@ -44,8 +47,8 @@ public class PathResolverService {
         return relativePaths;
     }
 
-    public String getRelativePath(String fullDirectoryPath, String fullFilePath) {
-        return fullFilePath.substring(fullDirectoryPath.length());
+    public String getRelativePath(String userDirectory, String fullFileOrDirectoryPath) {
+        return fullFileOrDirectoryPath.substring(userDirectory.length());
     }
 
     public String extractFileName(String relativePath) {

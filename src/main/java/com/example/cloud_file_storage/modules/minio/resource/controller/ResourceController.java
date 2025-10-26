@@ -1,9 +1,9 @@
 package com.example.cloud_file_storage.modules.minio.resource.controller;
 
 import com.example.cloud_file_storage.modules.auth.entity.User;
-import com.example.cloud_file_storage.modules.minio.resource.dto.MinioDto;
-import com.example.cloud_file_storage.modules.minio.resource.exception.DirectoryOrFileNotFound;
-import com.example.cloud_file_storage.modules.minio.resource.exception.InvalidPathException;
+import com.example.cloud_file_storage.modules.minio.dto.MinioDto;
+import com.example.cloud_file_storage.modules.minio.exception.DirectoryOrFileNotFound;
+import com.example.cloud_file_storage.modules.minio.exception.InvalidPathException;
 import com.example.cloud_file_storage.modules.minio.resource.service.*;
 import io.minio.errors.*;
 import org.springframework.core.io.Resource;

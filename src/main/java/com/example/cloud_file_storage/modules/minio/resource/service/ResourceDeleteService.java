@@ -1,8 +1,8 @@
 package com.example.cloud_file_storage.modules.minio.resource.service;
 
 import com.example.cloud_file_storage.common.MinioHelper;
-import com.example.cloud_file_storage.modules.minio.resource.exception.DirectoryOrFileNotFound;
-import com.example.cloud_file_storage.modules.minio.resource.exception.MinioIsNotAvailable;
+import com.example.cloud_file_storage.modules.minio.exception.DirectoryOrFileNotFound;
+import com.example.cloud_file_storage.modules.minio.exception.MinioIsNotAvailable;
 import com.example.cloud_file_storage.modules.minio.service.PathResolverService;
 import com.example.cloud_file_storage.modules.minio.service.ResourceValidationService;
 import com.example.cloud_file_storage.modules.minio.service.UserPathService;
@@ -55,7 +55,7 @@ public class ResourceDeleteService {
     }
 
     private void deleteDirectory(String fullPath) throws Exception {
-        List<String> objectsToDelete = minioHelper.listObjectsInDirectory(fullPath);
+        List<String> objectsToDelete = minioHelper.listObjectsInDirectory(fullPath, true);
         if(objectsToDelete.isEmpty()) {
             throw new DirectoryOrFileNotFound("Директория не найдена");
         }

@@ -28,18 +28,25 @@ public class MinioHelper {
 
     public StatObjectResponse statObject(String fullPath) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         return minioClient.statObject(StatObjectArgs.builder()
-                        .bucket(bucketName)
-                        .object(fullPath)
+                .bucket(bucketName)
+                .object(fullPath)
                 .build());
     }
 
-    public List<String> listObjectsInDirectory(String fullPath) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public void createDirectory(String path) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        minioClient.putObject(PutObjectArgs.builder()
+                .bucket(bucketName)
+                .object(path)
+                .build());
+    }
+
+    public List<String> listObjectsInDirectory(String fullPath, boolean recursive) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         List<String> objects = new ArrayList<>();
         Iterable<Result<Item>> results = minioClient.listObjects(
                 ListObjectsArgs.builder()
                         .bucket(bucketName)
                         .prefix(fullPath)
-                        .recursive(true)
+                        .recursive(recursive)
                         .build()
         );
         for (Result<Item> result : results) {
@@ -90,9 +97,9 @@ public class MinioHelper {
 
     public List<InputStreamResource> downloadAllFileInDirectory(String fullPath) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         List<InputStreamResource> allFilesInDirectory = new ArrayList<>();
-        List<String> allFilePathsInDirectory = listObjectsInDirectory(fullPath);
-        for(String filePath:allFilePathsInDirectory) {
-            if(filePath.endsWith("/")){
+        List<String> allFilePathsInDirectory = listObjectsInDirectory(fullPath, true);
+        for (String filePath : allFilePathsInDirectory) {
+            if (filePath.endsWith("/")) {
                 continue;
             }
             InputStreamResource file = downloadFile(filePath);
@@ -102,7 +109,7 @@ public class MinioHelper {
     }
 
     public boolean directoryExists(String fullPath) throws Exception {
-        List<String> objects = listObjectsInDirectory(fullPath);
+        List<String> objects = listObjectsInDirectory(fullPath, true);
         return !objects.isEmpty();
     }
 }

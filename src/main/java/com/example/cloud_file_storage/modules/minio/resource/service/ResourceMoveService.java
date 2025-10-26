@@ -1,13 +1,13 @@
 package com.example.cloud_file_storage.modules.minio.resource.service;
 
 import com.example.cloud_file_storage.common.MinioHelper;
-import com.example.cloud_file_storage.modules.minio.resource.dto.MinioDto;
-import com.example.cloud_file_storage.modules.minio.resource.dto.PathComponents;
-import com.example.cloud_file_storage.modules.minio.resource.dto.ResourceType;
-import com.example.cloud_file_storage.modules.minio.resource.exception.DirectoryExistException;
-import com.example.cloud_file_storage.modules.minio.resource.exception.DirectoryOrFileNotFound;
-import com.example.cloud_file_storage.modules.minio.resource.exception.FileAlreadyExistException;
-import com.example.cloud_file_storage.modules.minio.resource.exception.MinioIsNotAvailable;
+import com.example.cloud_file_storage.modules.minio.dto.MinioDto;
+import com.example.cloud_file_storage.modules.minio.dto.PathComponents;
+import com.example.cloud_file_storage.modules.minio.dto.ResourceType;
+import com.example.cloud_file_storage.modules.minio.exception.DirectoryExistException;
+import com.example.cloud_file_storage.modules.minio.exception.DirectoryOrFileNotFound;
+import com.example.cloud_file_storage.modules.minio.exception.FileAlreadyExistException;
+import com.example.cloud_file_storage.modules.minio.exception.MinioIsNotAvailable;
 import com.example.cloud_file_storage.modules.minio.service.PathResolverService;
 import com.example.cloud_file_storage.modules.minio.service.ResourceValidationService;
 import com.example.cloud_file_storage.modules.minio.service.UserPathService;
@@ -77,7 +77,7 @@ public class ResourceMoveService {
     }
 
     private MinioDto renameOrMoveDirectory(String fullFromPath, String fullToPath, PathComponents components) throws Exception {
-        List<String> objectsToMove = minioHelper.listObjectsInDirectory(fullFromPath);
+        List<String> objectsToMove = minioHelper.listObjectsInDirectory(fullFromPath, true);
         if(objectsToMove.isEmpty()) {
             throw new DirectoryOrFileNotFound("Директория не найдена");
         }

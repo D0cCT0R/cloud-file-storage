@@ -3,7 +3,7 @@ package com.example.cloud_file_storage.core.advice;
 
 import com.example.cloud_file_storage.modules.auth.exception.IncorrectLoginOrPasswordException;
 import com.example.cloud_file_storage.modules.auth.exception.UserAlreadyExistException;
-import com.example.cloud_file_storage.modules.minio.resource.exception.*;
+import com.example.cloud_file_storage.modules.minio.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.HttpStatus;

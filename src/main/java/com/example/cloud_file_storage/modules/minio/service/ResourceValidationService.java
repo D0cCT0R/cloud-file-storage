@@ -1,7 +1,7 @@
 package com.example.cloud_file_storage.modules.minio.service;
 
 
-import com.example.cloud_file_storage.modules.minio.resource.exception.InvalidPathException;
+import com.example.cloud_file_storage.modules.minio.exception.InvalidPathException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

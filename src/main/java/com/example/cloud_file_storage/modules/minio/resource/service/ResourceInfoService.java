@@ -2,12 +2,12 @@ package com.example.cloud_file_storage.modules.minio.resource.service;
 
 
 import com.example.cloud_file_storage.common.MinioHelper;
-import com.example.cloud_file_storage.modules.minio.resource.dto.MinioDto;
-import com.example.cloud_file_storage.modules.minio.resource.dto.PathComponents;
-import com.example.cloud_file_storage.modules.minio.resource.dto.ResourceType;
-import com.example.cloud_file_storage.modules.minio.resource.exception.DirectoryOrFileNotFound;
-import com.example.cloud_file_storage.modules.minio.resource.exception.InvalidPathException;
-import com.example.cloud_file_storage.modules.minio.resource.exception.MinioIsNotAvailable;
+import com.example.cloud_file_storage.modules.minio.dto.MinioDto;
+import com.example.cloud_file_storage.modules.minio.dto.PathComponents;
+import com.example.cloud_file_storage.modules.minio.dto.ResourceType;
+import com.example.cloud_file_storage.modules.minio.exception.DirectoryOrFileNotFound;
+import com.example.cloud_file_storage.modules.minio.exception.InvalidPathException;
+import com.example.cloud_file_storage.modules.minio.exception.MinioIsNotAvailable;
 import com.example.cloud_file_storage.modules.minio.service.PathResolverService;
 import com.example.cloud_file_storage.modules.minio.service.ResourceValidationService;
 import com.example.cloud_file_storage.modules.minio.service.UserPathService;
@@ -69,7 +69,7 @@ public class ResourceInfoService {
 
     private MinioDto getDirectoryInfo(String fullPath, String normalizedPath) throws DirectoryOrFileNotFound {
         try {
-            List<String> objects = minioHelper.listObjectsInDirectory(fullPath);
+            List<String> objects = minioHelper.listObjectsInDirectory(fullPath, true);
             if(objects.isEmpty()) {
                 throw new DirectoryOrFileNotFound("Директория не найдена");
             }

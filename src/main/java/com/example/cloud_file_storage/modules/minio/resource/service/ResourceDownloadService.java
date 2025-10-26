@@ -1,7 +1,7 @@
 package com.example.cloud_file_storage.modules.minio.resource.service;
 
 import com.example.cloud_file_storage.common.MinioHelper;
-import com.example.cloud_file_storage.modules.minio.resource.exception.InvalidPathException;
+import com.example.cloud_file_storage.modules.minio.exception.InvalidPathException;
 import com.example.cloud_file_storage.modules.minio.service.PathResolverService;
 import com.example.cloud_file_storage.modules.minio.service.ResourceValidationService;
 import com.example.cloud_file_storage.modules.minio.service.UserPathService;
@@ -55,7 +55,7 @@ public class ResourceDownloadService {
 
     private Resource downloadDirectory(String fullPath) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         List<InputStreamResource> filesInDirectory = minioHelper.downloadAllFileInDirectory(fullPath);
-        List<String> filesFullPaths = minioHelper.listObjectsInDirectory(fullPath);
+        List<String> filesFullPaths = minioHelper.listObjectsInDirectory(fullPath, true);
         List<String> relativePaths = resolverService.getRelativePaths(filesFullPaths, fullPath);
         return zipService.createZip(filesInDirectory, relativePaths);
     }

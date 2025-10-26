@@ -2,9 +2,9 @@ package com.example.cloud_file_storage.modules.minio.resource.service;
 
 
 import com.example.cloud_file_storage.common.MinioHelper;
-import com.example.cloud_file_storage.modules.minio.resource.dto.MinioDto;
-import com.example.cloud_file_storage.modules.minio.resource.dto.PathComponents;
-import com.example.cloud_file_storage.modules.minio.resource.dto.ResourceType;
+import com.example.cloud_file_storage.modules.minio.dto.MinioDto;
+import com.example.cloud_file_storage.modules.minio.dto.PathComponents;
+import com.example.cloud_file_storage.modules.minio.dto.ResourceType;
 import com.example.cloud_file_storage.modules.minio.service.PathResolverService;
 import com.example.cloud_file_storage.modules.minio.service.UserPathService;
 import io.minio.StatObjectResponse;
@@ -35,7 +35,7 @@ public class ResourceSearchService {
     public List<MinioDto> search(String query, Long userId) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         List<MinioDto> searchResults =  new ArrayList<>();
         String path = userPathService.getUserFolder(userId);
-        List<String> allUserObjects = minioHelper.listObjectsInDirectory(path);
+        List<String> allUserObjects = minioHelper.listObjectsInDirectory(path, true);
         for(String object: allUserObjects){
             if(object.endsWith("/")) {
                 String fileName = pathResolverService.extractFolderName(object);
