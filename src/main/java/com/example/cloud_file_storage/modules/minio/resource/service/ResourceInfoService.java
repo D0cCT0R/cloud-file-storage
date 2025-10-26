@@ -1,36 +1,37 @@
-package com.example.cloud_file_storage.modules.resource.service;
+package com.example.cloud_file_storage.modules.minio.resource.service;
 
 
-import com.example.cloud_file_storage.modules.resource.dto.MinioDto;
-import com.example.cloud_file_storage.modules.resource.dto.PathComponents;
-import com.example.cloud_file_storage.modules.resource.dto.ResourceType;
-import com.example.cloud_file_storage.modules.resource.exception.DirectoryOrFileNotFound;
-import com.example.cloud_file_storage.modules.resource.exception.InvalidPathException;
-import com.example.cloud_file_storage.modules.resource.exception.MinioIsNotAvailable;
+import com.example.cloud_file_storage.common.MinioHelper;
+import com.example.cloud_file_storage.modules.minio.resource.dto.MinioDto;
+import com.example.cloud_file_storage.modules.minio.resource.dto.PathComponents;
+import com.example.cloud_file_storage.modules.minio.resource.dto.ResourceType;
+import com.example.cloud_file_storage.modules.minio.resource.exception.DirectoryOrFileNotFound;
+import com.example.cloud_file_storage.modules.minio.resource.exception.InvalidPathException;
+import com.example.cloud_file_storage.modules.minio.resource.exception.MinioIsNotAvailable;
+import com.example.cloud_file_storage.modules.minio.service.PathResolverService;
+import com.example.cloud_file_storage.modules.minio.service.ResourceValidationService;
+import com.example.cloud_file_storage.modules.minio.service.UserPathService;
 import io.minio.*;
 import io.minio.errors.*;
-import io.minio.messages.Item;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
 public class ResourceInfoService {
-    private final MinioClient minioClient;
+    private final MinioHelper minioHelper;
     private final ResourceValidationService validationService;
     private final PathResolverService resolverService;
     private final UserPathService pathService;
-    private final String bucketName;
 
     @Autowired
-    public ResourceInfoService(ResourceValidationService validationService, PathResolverService resolverService, UserPathService pathService, @Value("${minio.bucket-name}") String bucketName, MinioClient minioClient) {
+    public ResourceInfoService(ResourceValidationService validationService, PathResolverService resolverService, UserPathService pathService, MinioHelper minioHelper) {
         this.validationService = validationService;
         this.resolverService = resolverService;
         this.pathService = pathService;
-        this.minioClient = minioClient;
-        this.bucketName = bucketName;
+        this.minioHelper = minioHelper;
     }
 
     public MinioDto getResourceInfo(String userPath, Long userId) throws InvalidPathException, DirectoryOrFileNotFound {
@@ -51,12 +52,7 @@ public class ResourceInfoService {
 
     private MinioDto getFileInfo(String fullPath, String normalizedPath) throws DirectoryOrFileNotFound {
         try {
-            StatObjectResponse stat = minioClient.statObject(
-                    StatObjectArgs.builder()
-                            .bucket(bucketName)
-                            .object(fullPath)
-                            .build()
-            );
+            StatObjectResponse stat = minioHelper.statObject(fullPath);
             PathComponents components = resolverService.extractPathComponents(normalizedPath);
             return new MinioDto(
                     components.parentPath(),
@@ -73,14 +69,8 @@ public class ResourceInfoService {
 
     private MinioDto getDirectoryInfo(String fullPath, String normalizedPath) throws DirectoryOrFileNotFound {
         try {
-            Iterable<Result<Item>> results = minioClient.listObjects(
-                    ListObjectsArgs.builder()
-                            .bucket(bucketName)
-                            .prefix(fullPath)
-                            .maxKeys(1)
-                            .build()
-            );
-            if(!results.iterator().hasNext()) {
+            List<String> objects = minioHelper.listObjectsInDirectory(fullPath);
+            if(objects.isEmpty()) {
                 throw new DirectoryOrFileNotFound("Директория не найдена");
             }
             PathComponents components = resolverService.extractPathComponents(normalizedPath);

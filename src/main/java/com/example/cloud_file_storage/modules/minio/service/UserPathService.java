@@ -1,4 +1,4 @@
-package com.example.cloud_file_storage.modules.resource.service;
+package com.example.cloud_file_storage.modules.minio.service;
 
 
 import org.springframework.stereotype.Service;
@@ -13,6 +13,10 @@ public class UserPathService {
         }
         return userRoot + userPath;
     }
+    public String getUserFolder(Long id) {
+        return getUserRootFolder(id);
+    }
+
     private String getUserRootFolder(Long id) {
         return "user-" + id + "-files/";
     }

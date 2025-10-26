@@ -1,4 +1,4 @@
-package com.example.cloud_file_storage.modules.resource.dto;
+package com.example.cloud_file_storage.modules.minio.resource.dto;
 
 public record PathComponents (
         String parentPath,
