@@ -1,7 +1,8 @@
 package com.example.cloud_file_storage.modules.minio.directory.controller;
 
 import com.example.cloud_file_storage.modules.auth.entity.User;
-import com.example.cloud_file_storage.modules.minio.directory.service.DirectoryCreateService;
+import com.example.cloud_file_storage.modules.minio.exception.DirectoryOrFileNotFound;
+import com.example.cloud_file_storage.modules.minio.service.CreateDirectoryService;
 import com.example.cloud_file_storage.modules.minio.directory.service.DirectoryInfoService;
 import com.example.cloud_file_storage.modules.minio.dto.MinioDto;
 import com.example.cloud_file_storage.modules.minio.exception.InvalidPathException;
@@ -25,25 +26,23 @@ import java.util.List;
 public class DirectoryController {
 
     private final DirectoryInfoService directoryInfoService;
-    private final DirectoryCreateService directoryCreateService;
+    private final CreateDirectoryService createDirectoryService;
 
     @Autowired
-    public DirectoryController(DirectoryInfoService directoryInfoService, DirectoryCreateService directoryCreateService) {
+    public DirectoryController(DirectoryInfoService directoryInfoService, CreateDirectoryService createDirectoryService) {
         this.directoryInfoService = directoryInfoService;
-        this.directoryCreateService = directoryCreateService;
+        this.createDirectoryService = createDirectoryService;
     }
 
     @GetMapping()
-    public ResponseEntity<?> getDirectoryContent(@RequestParam String path, @AuthenticationPrincipal User user) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InvalidPathException, InternalException {
+    public ResponseEntity<?> getDirectoryContent(@RequestParam String path, @AuthenticationPrincipal User user) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InvalidPathException, InternalException, DirectoryOrFileNotFound {
         List<MinioDto> directoryContent = directoryInfoService.getDirectoryInfo(path, user.getId());
         return ResponseEntity.ok().body(directoryContent);
     }
 
     @PostMapping
     public ResponseEntity<?> createFolder(@RequestParam String path, @AuthenticationPrincipal User user) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        MinioDto directory = directoryCreateService.createDirectory(path, user.getId());
+        MinioDto directory = createDirectoryService.createDirectory(path, user.getId());
         return ResponseEntity.ok(directory);
     }
-
-
 }

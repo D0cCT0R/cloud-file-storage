@@ -1,4 +1,4 @@
-package com.example.cloud_file_storage.common;
+package com.example.cloud_file_storage.modules.minio.service;
 
 
 import io.minio.*;
@@ -30,6 +30,14 @@ public class MinioHelper {
         return minioClient.statObject(StatObjectArgs.builder()
                 .bucket(bucketName)
                 .object(fullPath)
+                .build());
+    }
+
+    public void putObject(String path, InputStream stream, Long size) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        minioClient.putObject(PutObjectArgs.builder()
+                .bucket(bucketName)
+                .object(path)
+                .stream(stream, size, -1)
                 .build());
     }
 
@@ -108,8 +116,22 @@ public class MinioHelper {
         return allFilesInDirectory;
     }
 
-    public boolean directoryExists(String fullPath) throws Exception {
-        List<String> objects = listObjectsInDirectory(fullPath, true);
-        return !objects.isEmpty();
+    public boolean objectExist(String path) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        if(path.endsWith("/")) {
+            return !listObjectsInDirectory(path, false).isEmpty();
+        }
+        try {
+            statObject(path);
+            return true;
+        } catch (ErrorResponseException e) {
+            if(e.errorResponse().code().equals("NoSuchKey")) {
+                return false;
+            }
+            throw e;
+        }
+    }
+
+    public boolean isDirectory(String path) {
+        return path.endsWith("/");
     }
 }

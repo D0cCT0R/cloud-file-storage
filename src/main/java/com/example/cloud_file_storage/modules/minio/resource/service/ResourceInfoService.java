@@ -1,7 +1,7 @@
 package com.example.cloud_file_storage.modules.minio.resource.service;
 
 
-import com.example.cloud_file_storage.common.MinioHelper;
+import com.example.cloud_file_storage.modules.minio.service.MinioHelper;
 import com.example.cloud_file_storage.modules.minio.dto.MinioDto;
 import com.example.cloud_file_storage.modules.minio.dto.PathComponents;
 import com.example.cloud_file_storage.modules.minio.dto.ResourceType;
@@ -13,7 +13,12 @@ import com.example.cloud_file_storage.modules.minio.service.ResourceValidationSe
 import com.example.cloud_file_storage.modules.minio.service.UserPathService;
 import io.minio.*;
 import io.minio.errors.*;
+
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,55 +40,45 @@ public class ResourceInfoService {
     }
 
     public MinioDto getResourceInfo(String userPath, Long userId) throws InvalidPathException, DirectoryOrFileNotFound {
-        log.info("Берем информацию о пути: {}", userPath);
-        validationService.validateUserPath(userPath);
-        String normalizedUserPath = resolverService.normalizeUserPath(userPath);
-        String fullPath = pathService.toFullPath(userId, normalizedUserPath);
-        boolean isDirectory = userPath.endsWith("/");
-        MinioDto minioDto;
-        if (isDirectory) {
-            minioDto = getDirectoryInfo(fullPath, normalizedUserPath);
-        } else {
-            minioDto = getFileInfo(fullPath, normalizedUserPath);
+        try {
+            log.info("Get resource for user. Path: {}, userID {}", userPath, userId);
+            validationService.validateUserPath(userPath);
+            String normalizedUserPath = resolverService.normalizeUserPath(userPath);
+            String fullPath = pathService.toFullPath(userId, normalizedUserPath);
+            if (!minioHelper.objectExist(fullPath)) {
+                throw new DirectoryOrFileNotFound("Directory or file not found");
+            }
+            if (minioHelper.isDirectory(fullPath)) {
+                return getDirectoryInfo(fullPath, normalizedUserPath);
+            } else {
+                return getFileInfo(fullPath, normalizedUserPath);
+            }
+        } catch (DirectoryOrFileNotFound | InvalidPathException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new MinioIsNotAvailable("Minio is not available", e);
         }
-        log.info("Информация о пути {} успешна взята", userPath);
-        return minioDto;
     }
 
-    private MinioDto getFileInfo(String fullPath, String normalizedPath) throws DirectoryOrFileNotFound {
-        try {
-            StatObjectResponse stat = minioHelper.statObject(fullPath);
-            PathComponents components = resolverService.extractPathComponents(normalizedPath);
-            return new MinioDto(
-                    components.parentPath(),
-                    components.name(),
-                    stat.size(),
-                    ResourceType.FILE
-            );
-        } catch (ErrorResponseException e) {
-            throw new DirectoryOrFileNotFound("Файл не найден");
-        } catch (Exception e) {
-            throw new MinioIsNotAvailable("Неизвестная ошибка");
-        }
+    private MinioDto getFileInfo(String fullPath, String normalizedPath) throws DirectoryOrFileNotFound, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        StatObjectResponse stat = minioHelper.statObject(fullPath);
+        PathComponents components = resolverService.extractPathComponents(normalizedPath);
+        log.debug("Get file info complete successfully. Path: {}", fullPath);
+        return new MinioDto(
+                components.parentPath(),
+                components.name(),
+                stat.size(),
+                ResourceType.FILE
+        );
     }
 
     private MinioDto getDirectoryInfo(String fullPath, String normalizedPath) throws DirectoryOrFileNotFound {
-        try {
-            List<String> objects = minioHelper.listObjectsInDirectory(fullPath, true);
-            if(objects.isEmpty()) {
-                throw new DirectoryOrFileNotFound("Директория не найдена");
-            }
-            PathComponents components = resolverService.extractPathComponents(normalizedPath);
-            return new MinioDto(
-                    components.parentPath(),
-                    components.name(),
-                    null,
-                    ResourceType.DIRECTORY
-            );
-        } catch (DirectoryOrFileNotFound e) {
-                throw e;
-        } catch (Exception e) {
-            throw new MinioIsNotAvailable("Неизвестная ошибка");
-        }
+        PathComponents components = resolverService.extractPathComponents(normalizedPath);
+        log.debug("Get directory info complete successfully. Path: {}", fullPath);
+        return MinioDto.builder()
+                .path(components.parentPath())
+                .name(components.name())
+                .type(ResourceType.DIRECTORY)
+                .build();
     }
 }

@@ -6,12 +6,15 @@ import com.example.cloud_file_storage.modules.minio.exception.DirectoryOrFileNot
 import com.example.cloud_file_storage.modules.minio.exception.InvalidPathException;
 import com.example.cloud_file_storage.modules.minio.resource.service.*;
 import io.minio.errors.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -27,13 +30,16 @@ public class ResourceController {
     private final ResourceMoveService resourceMoveService;
     private final ResourceDownloadService resourceDownloadService;
     private final ResourceSearchService resourceSearchService;
+    private final ResourceUploadService uploadService;
 
-    public ResourceController(ResourceInfoService resourceInfoService, ResourceDeleteService resourceDeleteService, ResourceMoveService resourceMoveService, ResourceDownloadService resourceDownloadService, ResourceSearchService resourceSearchService) {
+    @Autowired
+    public ResourceController(ResourceInfoService resourceInfoService, ResourceDeleteService resourceDeleteService, ResourceMoveService resourceMoveService, ResourceDownloadService resourceDownloadService, ResourceSearchService resourceSearchService, ResourceUploadService uploadService) {
         this.resourceInfoService = resourceInfoService;
         this.resourceDeleteService = resourceDeleteService;
         this.resourceMoveService = resourceMoveService;
         this.resourceDownloadService = resourceDownloadService;
         this.resourceSearchService = resourceSearchService;
+        this.uploadService = uploadService;
     }
 
 
@@ -56,8 +62,14 @@ public class ResourceController {
         return ResponseEntity.ok(minioDto);
     }
 
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadResource(@RequestParam("files")List<MultipartFile> files, @RequestParam("path") String path, @AuthenticationPrincipal User user) throws Exception {
+        List<MinioDto> uploadFiles = uploadService.upload(path, user.getId(), files);
+        return ResponseEntity.status(HttpStatus.CREATED).body(uploadFiles);
+    }
+
     @GetMapping("/download")
-    public ResponseEntity<?> downloadResource(@RequestParam String path, @AuthenticationPrincipal User user) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InvalidPathException, InternalException {
+    public ResponseEntity<?> downloadResource(@RequestParam String path, @AuthenticationPrincipal User user) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InvalidPathException, InternalException, DirectoryOrFileNotFound {
         Resource resource = resourceDownloadService.downloadResource(path, user.getId());
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -70,6 +82,4 @@ public class ResourceController {
         List<MinioDto> searchResult = resourceSearchService.search(query, user.getId());
         return ResponseEntity.ok(searchResult);
     }
-
-
 }

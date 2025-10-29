@@ -30,15 +30,15 @@ public class AuthServiceFacade {
     }
 
     public AuthResponse signUpUser(AuthRequest request, HttpServletRequest servletRequest) throws UserAlreadyExistException, IncorrectLoginOrPasswordException {
-        log.info("Начат процесс регистрации пользователя");
+        log.info("Start sign up user. Username: {}", request.username());
         if (userService.existByUsername(request.username())) {
             throw new UserAlreadyExistException("Пользователь с таким именем уже существет");
         }
         String hashPassword = passwordEncoder.encode(request.password());
         User user = userService.saveUser(request.username(), hashPassword);
-        log.debug("Пользователь успешно сохранен");
+        log.debug("User save successfully. Username: {}", request.username());
         authenticationUserService.authenticateUser(request.username(), request.password(), servletRequest);
-        log.debug("Пользователь успешно зарегистрирован");
+        log.debug("User registration complete successfully. Username: {}", request.username());
         return new AuthResponse(user.getLogin());
     }
 }

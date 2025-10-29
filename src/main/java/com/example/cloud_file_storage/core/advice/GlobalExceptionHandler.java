@@ -18,56 +18,56 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserAlreadyExistException.class)
     public ResponseEntity<ErrorResponse> handleUserAlreadyExist(UserAlreadyExistException ex) {
-        log.info("Попытка регистрации существующего пользователя");
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(ex.getMessage()));
+        log.info("Attempt to register an existing user: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse("User already exist"));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
-        log.warn("Ошибка валидации входных данных: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage()));
+        log.warn("Input data is incorrect: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Input data is incorrect"));
     }
 
     @ExceptionHandler(IncorrectLoginOrPasswordException.class)
     public ResponseEntity<ErrorResponse> handleAuthenticationEx(IncorrectLoginOrPasswordException ex) {
-        log.warn("Ошибка аутентификации {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse(ex.getMessage()));
+        log.warn("Authentication error {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("Incorrect login or password"));
     }
 
     @ExceptionHandler(InvalidPathException.class)
     public ResponseEntity<ErrorResponse> handleInvalidPath(InvalidPathException ex) {
-        log.warn("Неверный формат пути");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage()));
+        log.warn("Invalid path: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Validation error"));
     }
 
-    @ExceptionHandler(FileAlreadyExistException.class)
-    public ResponseEntity<ErrorResponse> handleFileAlreadyExist(FileAlreadyExistException ex) {
-        log.warn("Файл уже существует {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(ex.getMessage()));
+    @ExceptionHandler(DirectoryOrFileAlreadyExistException.class)
+    public ResponseEntity<ErrorResponse> handleFileAlreadyExist(DirectoryOrFileAlreadyExistException ex) {
+        log.warn("Resource already exist: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse("Resource already exist"));
     }
 
     @ExceptionHandler(DirectoryOrFileNotFound.class)
     public ResponseEntity<ErrorResponse> handleNotFoundDirectoryOrFile(DirectoryOrFileNotFound ex) {
-        log.warn("Ошибка поиска директории {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Ресурс не найден"));
+        log.warn("Resource search error: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Resource not found"));
     }
 
     @ExceptionHandler(MinioIsNotAvailable.class)
     public ResponseEntity<ErrorResponse> handleMinioIsNotAvailable(MinioIsNotAvailable ex) {
-        log.error("Минио недоступен: {}", ex.getMessage());
-        return ResponseEntity.internalServerError().body(new ErrorResponse("Неизвестная ошибка"));
+        log.error("Minio unavailable", ex);
+        return ResponseEntity.internalServerError().body(new ErrorResponse("Minio unavailable"));
     }
 
     @ExceptionHandler({DataAccessResourceFailureException.class, InitializeBucketException.class})
     public ResponseEntity<ErrorResponse> handleInternalServerException(Exception  ex) {
-        log.error("Внутренняя ошибка: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new ErrorResponse("Сервис временно недоступен, попробуйте позже"));
+        log.error("Internal error: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new ErrorResponse("Service unavailable, try later"));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleUnknownError(Exception ex) {
-        log.error("Обнаружена неизвестная ошибка: {}", ex.getMessage());
-        return ResponseEntity.internalServerError().body(new ErrorResponse("Неизвестная ошибка"));
+        log.error("Unknown error: {}", ex.getMessage(), ex);
+        return ResponseEntity.internalServerError().body(new ErrorResponse("Unknown error, please try later"));
     }
 
 }

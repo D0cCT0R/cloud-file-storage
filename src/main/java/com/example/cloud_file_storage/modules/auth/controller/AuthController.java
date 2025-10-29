@@ -40,9 +40,7 @@ public class AuthController {
 
     @PostMapping("/sign-in")
     public ResponseEntity<?> signIn(@Valid @RequestBody AuthRequest request, HttpServletRequest servletRequest) throws IncorrectLoginOrPasswordException {
-        log.info("Начат процесс входа пользователя");
         authenticationUserService.authenticateUser(request.username(), request.password(), servletRequest);
-        log.debug("Пользователь успешно вошел в аккаунт");
         return ResponseEntity.ok(new AuthResponse(request.username()));
     }
 }

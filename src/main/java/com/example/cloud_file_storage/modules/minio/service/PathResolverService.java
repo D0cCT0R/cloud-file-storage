@@ -55,6 +55,7 @@ public class PathResolverService {
         int lastSlash = relativePath.lastIndexOf('/');
         return (lastSlash == -1) ? relativePath : relativePath.substring(lastSlash + 1);
     }
+
     public String extractFolderName(String relativePath) {
         if (relativePath == null || relativePath.isEmpty() || relativePath.equals("/")) {
             return "";
@@ -68,4 +69,10 @@ public class PathResolverService {
             return path.substring(lastSlash + 1);
         }
     }
+
+    public String extractFirstComponent(String path) {
+        int firstSlash = path.indexOf('/');
+        return firstSlash != -1 ? path.substring(0, firstSlash + 1) : path;
+    }
+
 }
