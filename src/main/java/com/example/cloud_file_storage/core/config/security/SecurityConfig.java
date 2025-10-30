@@ -69,8 +69,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.
                 authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/css/**", "/js/**", "/images/**", "/auth/sign-up", "/auth/sign-in").permitAll()
-                                .requestMatchers("/**").authenticated()
+                        auth.requestMatchers("/api/auth/sign-up", "/api/auth/sign-in").permitAll()
+                                .requestMatchers("/api/**").authenticated()
+                                .anyRequest().permitAll()
                 )
                 .userDetailsService(userDetailsService())
                 .exceptionHandling(exception ->
@@ -96,9 +97,9 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .formLogin(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
+
                 .build();
     }
 }
