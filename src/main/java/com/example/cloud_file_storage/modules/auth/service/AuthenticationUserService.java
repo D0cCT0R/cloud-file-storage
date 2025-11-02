@@ -3,6 +3,7 @@ package com.example.cloud_file_storage.modules.auth.service;
 
 import com.example.cloud_file_storage.modules.auth.exception.IncorrectLoginOrPasswordException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,13 +28,14 @@ public class AuthenticationUserService {
         this.authenticationManager = authenticationManager;
     }
     
-    public void authenticateUser(String username, String password, HttpServletRequest request) throws IncorrectLoginOrPasswordException {
+    public void authenticateUser(String username, String password, HttpServletRequest request, HttpServletResponse response) throws IncorrectLoginOrPasswordException {
         try {
             log.info("Start authenticate user. Username: {}", username);
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
             SecurityContext context = SecurityContextHolder.createEmptyContext();
             context.setAuthentication(authentication);
-            repository.saveContext(context, request, null);
+            SecurityContextHolder.setContext(context);
+            repository.saveContext(context, request, response);
             log.debug("Authenticate user complete successfully. Username: {}", username);
         } catch (AuthenticationException e) {
             throw new IncorrectLoginOrPasswordException("Incorrect login or password");

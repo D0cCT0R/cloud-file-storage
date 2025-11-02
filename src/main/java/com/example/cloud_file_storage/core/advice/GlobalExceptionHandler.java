@@ -3,7 +3,7 @@ package com.example.cloud_file_storage.core.advice;
 
 import com.example.cloud_file_storage.modules.auth.exception.IncorrectLoginOrPasswordException;
 import com.example.cloud_file_storage.modules.auth.exception.UserAlreadyExistException;
-import com.example.cloud_file_storage.modules.minio.exception.*;
+import com.example.cloud_file_storage.modules.storage.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.HttpStatus;
@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @Slf4j
 @RestControllerAdvice
@@ -50,6 +51,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleNotFoundDirectoryOrFile(DirectoryOrFileNotFound ex) {
         log.warn("Resource search error: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Resource not found"));
+    }
+
+    @ExceptionHandler(FailInitializeUserRootDirectory.class)
+    public ResponseEntity<ErrorResponse> handleFailToInitUserDir(FailInitializeUserRootDirectory ex) {
+        log.error("Fail to init user directory, user folder already exist");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("Internal server error"));
     }
 
     @ExceptionHandler(MinioIsNotAvailable.class)

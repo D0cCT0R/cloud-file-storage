@@ -1,6 +1,6 @@
 package com.example.cloud_file_storage.core.config;
 
-import com.example.cloud_file_storage.modules.minio.exception.InitializeBucketException;
+import com.example.cloud_file_storage.modules.storage.exception.InitializeBucketException;
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
@@ -42,7 +42,7 @@ public class MinioConfig {
                             .build());
                 }
             } catch (Exception e) {
-                throw new InitializeBucketException("Ошибка при создания бакета" + e);
+                throw new InitializeBucketException("Ошибка при создания бакета", e);
             }
         };
     }
