@@ -8,3 +8,8 @@ minio.url=http://localhost:9000
 minio.access-key=your_root_username
 minio.secret-key=your_root_password
 minio.bucket-name=cloud-storage
+
+# REDIS SETTINGS
+spring.data.redis.host=localhost
+spring.data.redis.port=PORT
+spring.data.redis.password=PASSWORD
