@@ -81,18 +81,6 @@ public class SecurityConfig {
                                 .anyRequest().permitAll()
                 )
                 .userDetailsService(userDetailsService())
-                .exceptionHandling(exception ->
-                        exception.authenticationEntryPoint((request, response, authException) -> {
-                            log.info("Попытка перехода на запрещенный end-point");
-                            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                            String jsonResponse = """
-                                        {"message":"Пользователь не авторизирован"}
-                                    """;
-
-                            response.getWriter().write(jsonResponse);
-                        })
-                )
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/sign-out")
                         .logoutSuccessHandler((request, response, authentication) -> {

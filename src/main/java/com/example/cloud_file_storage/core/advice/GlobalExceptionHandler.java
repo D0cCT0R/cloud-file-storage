@@ -8,9 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @Slf4j
@@ -53,10 +56,29 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Resource not found"));
     }
 
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxSizeException(
+            MaxUploadSizeExceededException ex) {
+        log.warn("File size limit exceeded: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("File size limit 100KB"));
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<ErrorResponse> handleMultipartException(MultipartException ex) {
+        log.error("Multipart error", ex);
+        return ResponseEntity.internalServerError().body(new ErrorResponse("Upload file error"));
+    }
+
     @ExceptionHandler(FailInitializeUserRootDirectory.class)
     public ResponseEntity<ErrorResponse> handleFailToInitUserDir(FailInitializeUserRootDirectory ex) {
         log.error("Fail to init user directory, user folder already exist");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("Internal server error"));
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException ex) {
+        log.warn("User is not authorize", ex);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("Not authorize"));
     }
 
     @ExceptionHandler(MinioIsNotAvailable.class)
@@ -66,7 +88,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({DataAccessResourceFailureException.class, InitializeBucketException.class})
-    public ResponseEntity<ErrorResponse> handleInternalServerException(Exception  ex) {
+    public ResponseEntity<ErrorResponse> handleInternalServerException(Exception ex) {
         log.error("Internal error: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new ErrorResponse("Service unavailable, try later"));
     }
