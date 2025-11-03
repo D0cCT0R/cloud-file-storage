@@ -4,3 +4,5 @@ public record CurrentUserDto(
         String username
 ) {
 }
+
+

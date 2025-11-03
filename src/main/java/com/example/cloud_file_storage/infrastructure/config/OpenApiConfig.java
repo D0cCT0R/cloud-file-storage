@@ -21,3 +21,4 @@ public class OpenApiConfig {
                                 .email("ershov.2004416@gmail.com")));
     }
 }
+

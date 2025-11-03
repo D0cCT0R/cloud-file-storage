@@ -48,7 +48,7 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
     }
 
-    public AuthResponse signUp(AuthRequest request, HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws UserAlreadyExistException, IncorrectLoginOrPasswordException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, FailInitializeUserRootDirectory, InternalException {
+    public AuthResponse signUp(AuthRequest request, HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws UserAlreadyExistException, IncorrectLoginOrPasswordException {
         log.info("Start signUp user. Username: {}", request.username());
         String hashPassword = passwordEncoder.encode(request.password());
         User user = User.builder()
@@ -87,3 +87,5 @@ public class AuthService {
     }
 
 }
+
+

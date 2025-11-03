@@ -5,3 +5,5 @@ public class MinioIsNotAvailable extends RuntimeException {
         super(message, cause);
     }
 }
+
+

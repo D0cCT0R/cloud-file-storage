@@ -26,3 +26,5 @@ public class UserPathResolver {
         return pathService.toFullPath(userId, normalizedUserPath);
     }
 }
+
+

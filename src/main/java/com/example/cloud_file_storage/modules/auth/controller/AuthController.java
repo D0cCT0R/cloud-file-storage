@@ -46,7 +46,7 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @PostMapping("/sign-up")
-    public ResponseEntity<?> signUp(@Valid @RequestBody AuthRequest request, HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws UserAlreadyExistException, IncorrectLoginOrPasswordException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, FailInitializeUserRootDirectory, InternalException {
+    public ResponseEntity<?> signUp(@Valid @RequestBody AuthRequest request, HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws UserAlreadyExistException, IncorrectLoginOrPasswordException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         AuthResponse response = authService.signUp(request, servletRequest, servletResponse);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -63,3 +63,5 @@ public class AuthController {
         return ResponseEntity.ok(new AuthResponse(request.username()));
     }
 }
+
+
