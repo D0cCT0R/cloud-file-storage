@@ -24,16 +24,17 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
-@Slf4j
 @Service
+@Slf4j
 public class AuthServiceFacade {
 
     private final AuthenticationUserService authenticationUserService;
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
     private final ApplicationEventPublisher eventPublisher;
+
     @Autowired
-    public AuthServiceFacade(UserService userService, PasswordEncoder passwordEncoder, AuthenticationUserService authenticationUserService, DirectoryCreationService directoryCreationService, ApplicationEventPublisher eventPublisher) {
+    public AuthServiceFacade(UserService userService, PasswordEncoder passwordEncoder, AuthenticationUserService authenticationUserService, ApplicationEventPublisher eventPublisher) {
         this.authenticationUserService = authenticationUserService;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;

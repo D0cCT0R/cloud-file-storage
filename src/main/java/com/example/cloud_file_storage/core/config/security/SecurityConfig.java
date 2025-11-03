@@ -102,7 +102,7 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
                 .securityContext(context -> context
                         .securityContextRepository(securityContextRepository())
                 )

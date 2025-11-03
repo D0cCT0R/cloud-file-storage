@@ -45,7 +45,7 @@ public class ResourceDownloadService {
                 throw new DirectoryOrFileNotFound("Directory or file not found");
             }
             if (minioHelper.isDirectory(fullPath)) {
-                return downloadDirectory(fullPath, userPath, userId);
+                return downloadDirectory(fullPath, userPath);
             } else {
                 return downloadFile(fullPath, userPath);
             }
@@ -68,11 +68,11 @@ public class ResourceDownloadService {
         return new DownloadResult(filename, streamingBody);
     }
 
-    private DownloadResult downloadDirectory(String fullPath, String userPath, Long id) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    private DownloadResult downloadDirectory(String fullPath, String userPath) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         List<FileData> filesInDirectory = minioHelper.downloadAllFileInDirectory(fullPath);
-        List<String> relativePaths = resolverService.getRelativePaths(
+        List<String> relativePaths = resolverService.getRelativePathsForZip(
                 filesInDirectory.stream().map(FileData::path).collect(Collectors.toList()),
-                id
+                fullPath
         );
         String fileName = Paths.get(userPath).getFileName() + ".zip";
         StreamingResponseBody strBody = zipService.createZip(filesInDirectory, relativePaths);

@@ -26,11 +26,11 @@ public class PathResolverService {
         return normalized;
     }
 
-    public PathComponents extractPathComponents(String normalizedPath) {
-        if (normalizedPath.isEmpty()) {
+    public PathComponents extractPathComponents(String userPath) {
+        if (userPath.isEmpty()) {
             return new PathComponents("/", "");
         }
-        String path = normalizedPath;
+        String path = userPath;
         if (path.startsWith("/")) {
             path = path.substring(1);
         }
@@ -55,10 +55,10 @@ public class PathResolverService {
         }
     }
 
-    public List<String> getRelativePaths(List<String> fullPathsFile, Long id) {
+    public List<String> getRelativePathsForZip(List<String> fullPathsFile, String fullPathDir) {
         List<String> relativePaths = new ArrayList<>();
         for (String path : fullPathsFile) {
-            relativePaths.add(getRelativePath(id, path));
+            relativePaths.add(path.substring(fullPathDir.length()));
         }
         return relativePaths;
     }
