@@ -1,4 +1,4 @@
-package com.example.cloud_file_storage.core.config.security;
+package com.example.cloud_file_storage.infrastructure.security;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

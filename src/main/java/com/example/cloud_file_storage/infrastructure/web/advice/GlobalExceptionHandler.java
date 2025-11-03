@@ -1,4 +1,4 @@
-package com.example.cloud_file_storage.core.advice;
+package com.example.cloud_file_storage.infrastructure.web.advice;
 
 
 import com.example.cloud_file_storage.modules.auth.exception.IncorrectLoginOrPasswordException;
@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
-import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @Slf4j
 @RestControllerAdvice
@@ -67,12 +66,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMultipartException(MultipartException ex) {
         log.error("Multipart error", ex);
         return ResponseEntity.internalServerError().body(new ErrorResponse("Upload file error"));
-    }
-
-    @ExceptionHandler(FailInitializeUserRootDirectory.class)
-    public ResponseEntity<ErrorResponse> handleFailToInitUserDir(FailInitializeUserRootDirectory ex) {
-        log.error("Fail to init user directory, user folder already exist");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("Internal server error"));
     }
 
     @ExceptionHandler(AuthenticationException.class)

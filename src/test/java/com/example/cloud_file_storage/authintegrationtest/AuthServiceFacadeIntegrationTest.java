@@ -5,7 +5,6 @@ import com.example.cloud_file_storage.modules.auth.dto.AuthRequest;
 import com.example.cloud_file_storage.modules.auth.dto.AuthResponse;
 import com.example.cloud_file_storage.modules.auth.entity.User;
 import com.example.cloud_file_storage.modules.auth.event.UserRegisteredEvent;
-import com.example.cloud_file_storage.modules.auth.facade.AuthServiceFacade;
 import com.example.cloud_file_storage.modules.auth.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

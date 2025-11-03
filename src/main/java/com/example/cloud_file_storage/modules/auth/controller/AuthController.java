@@ -5,9 +5,7 @@ import com.example.cloud_file_storage.modules.auth.dto.AuthRequest;
 import com.example.cloud_file_storage.modules.auth.dto.AuthResponse;
 import com.example.cloud_file_storage.modules.auth.exception.IncorrectLoginOrPasswordException;
 import com.example.cloud_file_storage.modules.auth.exception.UserAlreadyExistException;
-import com.example.cloud_file_storage.modules.auth.facade.AuthServiceFacade;
-import com.example.cloud_file_storage.modules.auth.service.AuthenticationUserService;
-import com.example.cloud_file_storage.modules.storage.exception.FailInitializeUserRootDirectory;
+import com.example.cloud_file_storage.modules.auth.service.AuthService;
 import io.minio.errors.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -34,13 +32,11 @@ import java.security.NoSuchAlgorithmException;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final AuthenticationUserService authenticationUserService;
-    private final AuthServiceFacade authServiceFacade;
+    private final AuthService authService;
 
     @Autowired
-    public AuthController(AuthServiceFacade authServiceFacade, AuthenticationUserService authenticationUserService) {
-        this.authenticationUserService = authenticationUserService;
-        this.authServiceFacade = authServiceFacade;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
 
     @Operation(summary = "Registration", description = "Creating new user and return his name", responses = {
@@ -51,7 +47,7 @@ public class AuthController {
     })
     @PostMapping("/sign-up")
     public ResponseEntity<?> signUp(@Valid @RequestBody AuthRequest request, HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws UserAlreadyExistException, IncorrectLoginOrPasswordException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, FailInitializeUserRootDirectory, InternalException {
-        AuthResponse response = authServiceFacade.signUpUser(request, servletRequest, servletResponse);
+        AuthResponse response = authService.signUp(request, servletRequest, servletResponse);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -63,7 +59,7 @@ public class AuthController {
     })
     @PostMapping("/sign-in")
     public ResponseEntity<?> signIn(@Valid @RequestBody AuthRequest request, HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws IncorrectLoginOrPasswordException {
-        authenticationUserService.authenticateUser(request.username(), request.password(), servletRequest, servletResponse);
+        authService.login(request, servletRequest, servletResponse);
         return ResponseEntity.ok(new AuthResponse(request.username()));
     }
 }

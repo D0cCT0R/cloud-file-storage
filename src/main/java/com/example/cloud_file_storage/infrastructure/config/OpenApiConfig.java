@@ -1,4 +1,4 @@
-package com.example.cloud_file_storage.core.config;
+package com.example.cloud_file_storage.infrastructure.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;

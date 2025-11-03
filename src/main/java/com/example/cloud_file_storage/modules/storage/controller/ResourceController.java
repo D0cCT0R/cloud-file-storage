@@ -1,12 +1,11 @@
 package com.example.cloud_file_storage.modules.storage.controller;
 
-import com.example.cloud_file_storage.core.config.security.CustomUserDetails;
+import com.example.cloud_file_storage.infrastructure.security.CustomUserDetails;
 import com.example.cloud_file_storage.modules.storage.dto.storage.MinioDto;
 import com.example.cloud_file_storage.modules.storage.exception.DirectoryOrFileNotFound;
 import com.example.cloud_file_storage.modules.storage.exception.InvalidPathException;
 import com.example.cloud_file_storage.modules.storage.dto.resource.DownloadResult;
 import com.example.cloud_file_storage.modules.storage.service.resource.*;
-import io.minio.errors.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,9 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @Tag(name = "Resource API", description = "Operation with files and directories")

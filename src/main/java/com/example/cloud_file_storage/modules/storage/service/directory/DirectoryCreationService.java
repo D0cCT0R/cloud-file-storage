@@ -4,7 +4,6 @@ import com.example.cloud_file_storage.modules.storage.dto.storage.MinioDto;
 import com.example.cloud_file_storage.modules.storage.dto.storage.PathComponents;
 import com.example.cloud_file_storage.modules.storage.dto.storage.ResourceType;
 import com.example.cloud_file_storage.modules.storage.exception.DirectoryOrFileAlreadyExistException;
-import com.example.cloud_file_storage.modules.storage.exception.FailInitializeUserRootDirectory;
 import com.example.cloud_file_storage.modules.storage.exception.InvalidPathException;
 import com.example.cloud_file_storage.modules.storage.exception.MinioIsNotAvailable;
 import com.example.cloud_file_storage.modules.storage.service.shared.*;
@@ -60,11 +59,8 @@ public class DirectoryCreationService {
         }
     }
 
-    public void createUserDirectory(Long userId) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException, FailInitializeUserRootDirectory {
+    public void createUserDirectory(Long userId) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         String userDir = pathService.getUserFolder(userId);
-        if(minioHelper.objectExist(userDir)) {
-            throw new FailInitializeUserRootDirectory("Fail to init user directory");
-        }
         minioHelper.createDirectory(userDir);
     }
 

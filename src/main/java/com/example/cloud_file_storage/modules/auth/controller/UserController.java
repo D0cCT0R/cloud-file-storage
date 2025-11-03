@@ -1,6 +1,6 @@
 package com.example.cloud_file_storage.modules.auth.controller;
 
-import com.example.cloud_file_storage.core.config.security.CustomUserDetails;
+import com.example.cloud_file_storage.infrastructure.security.CustomUserDetails;
 import com.example.cloud_file_storage.modules.auth.dto.CurrentUserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

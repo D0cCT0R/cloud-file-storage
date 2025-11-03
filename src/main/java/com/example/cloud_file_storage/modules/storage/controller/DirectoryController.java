@@ -1,6 +1,6 @@
 package com.example.cloud_file_storage.modules.storage.controller;
 
-import com.example.cloud_file_storage.core.config.security.CustomUserDetails;
+import com.example.cloud_file_storage.infrastructure.security.CustomUserDetails;
 import com.example.cloud_file_storage.modules.storage.exception.DirectoryOrFileAlreadyExistException;
 import com.example.cloud_file_storage.modules.storage.exception.DirectoryOrFileNotFound;
 import com.example.cloud_file_storage.modules.storage.service.directory.DirectoryCreationService;

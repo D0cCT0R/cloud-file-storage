@@ -1,15 +1,15 @@
-package com.example.cloud_file_storage.core.config.security;
+package com.example.cloud_file_storage.infrastructure.config;
 
 
+import com.example.cloud_file_storage.infrastructure.security.CustomUserDetails;
 import com.example.cloud_file_storage.modules.auth.entity.User;
-import com.example.cloud_file_storage.modules.auth.service.UserService;
+import com.example.cloud_file_storage.modules.auth.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -36,17 +36,17 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final UserService userService;
+    private final UserRepository repository;
 
     @Autowired
-    public SecurityConfig(UserService userService) {
-        this.userService = userService;
+    public SecurityConfig(UserRepository repository) {
+        this.repository = repository;
     }
 
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> {
-            User user = userService.getUserByUsername(username)
+            User user = repository.getUserByLogin(username)
                     .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
             return new CustomUserDetails(user.getId(), user.getLogin(), user.getPassword(), Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
         };
