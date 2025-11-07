@@ -1,7 +1,7 @@
 package com.example.cloud_file_storage.modules.storage.service.resource;
 
-import com.example.cloud_file_storage.modules.storage.exception.DirectoryOrFileNotFound;
-import com.example.cloud_file_storage.modules.storage.exception.MinioIsNotAvailable;
+import com.example.cloud_file_storage.modules.storage.exception.DirectoryOrFileNotFoundException;
+import com.example.cloud_file_storage.modules.storage.exception.MinioIsNotAvailableException;
 import com.example.cloud_file_storage.modules.storage.dto.resource.DownloadResult;
 import com.example.cloud_file_storage.modules.storage.dto.resource.FileData;
 import com.example.cloud_file_storage.modules.storage.service.shared.*;
@@ -11,12 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
-
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,22 +33,22 @@ public class ResourceDownloadService {
         this.resolver = resolver;
     }
 
-    public DownloadResult downloadResource(String userPath, Long userId) throws DirectoryOrFileNotFound, InvalidPathException {
+    public DownloadResult downloadResource(String userPath, Long userId) {
         try {
             log.info("Download resource for user.Path: {} , userID: {}", userPath, userId);
             String fullPath = resolver.resolveFullPath(userPath, userId);
             if (!minioHelper.objectExist(fullPath)) {
-                throw new DirectoryOrFileNotFound("Directory or file not found");
+                throw new DirectoryOrFileNotFoundException("Directory or file not found");
             }
             if (minioHelper.isDirectory(fullPath)) {
                 return downloadDirectory(fullPath, userPath);
             } else {
                 return downloadFile(fullPath, userPath);
             }
-        } catch (InvalidPathException | DirectoryOrFileNotFound e) {
+        } catch (InvalidPathException | DirectoryOrFileNotFoundException e) {
             throw e;
         } catch (Exception e) {
-            throw new MinioIsNotAvailable("Minio is not available", e);
+            throw new MinioIsNotAvailableException("Minio is not available", e);
         }
     }
 
@@ -68,7 +64,7 @@ public class ResourceDownloadService {
         return new DownloadResult(filename, streamingBody);
     }
 
-    private DownloadResult downloadDirectory(String fullPath, String userPath) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    private DownloadResult downloadDirectory(String fullPath, String userPath) throws Exception {
         List<FileData> filesInDirectory = minioHelper.downloadAllFileInDirectory(fullPath);
         List<String> relativePaths = resolverService.getRelativePathsForZip(
                 filesInDirectory.stream().map(FileData::path).collect(Collectors.toList()),

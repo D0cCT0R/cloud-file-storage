@@ -25,10 +25,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
 @Service
 @Slf4j
 public class AuthService {
@@ -48,7 +44,7 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
     }
 
-    public AuthResponse signUp(AuthRequest request, HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws UserAlreadyExistException, IncorrectLoginOrPasswordException {
+    public AuthResponse signUp(AuthRequest request, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
         log.info("Start signUp user. Username: {}", request.username());
         String hashPassword = passwordEncoder.encode(request.password());
         User user = User.builder()
@@ -67,12 +63,12 @@ public class AuthService {
         }
     }
 
-    public void login(AuthRequest authRequest, HttpServletRequest request, HttpServletResponse response) throws IncorrectLoginOrPasswordException {
+    public void login(AuthRequest authRequest, HttpServletRequest request, HttpServletResponse response) {
         authenticateUser(authRequest.username(), authRequest.password(), request, response);
     }
 
 
-    private void authenticateUser(String username, String password, HttpServletRequest request, HttpServletResponse response) throws IncorrectLoginOrPasswordException {
+    private void authenticateUser(String username, String password, HttpServletRequest request, HttpServletResponse response) {
         try {
             log.info("Start authenticate user. Username: {}", username);
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));

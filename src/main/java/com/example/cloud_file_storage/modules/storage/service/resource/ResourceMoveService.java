@@ -6,9 +6,9 @@ import com.example.cloud_file_storage.modules.storage.dto.storage.MinioDto;
 import com.example.cloud_file_storage.modules.storage.dto.storage.PathComponents;
 import com.example.cloud_file_storage.modules.storage.dto.storage.ResourceType;
 import io.minio.*;
+import io.minio.errors.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 
@@ -27,13 +27,13 @@ public class ResourceMoveService {
         this.resolver = resolver;
     }
 
-    public MinioDto moveOrRenameResource(String fromUserPath, String toUserPath, Long userId) throws Exception {
+    public MinioDto moveOrRenameResource(String fromUserPath, String toUserPath, Long userId) {
         try {
             log.info("Move or Rename resource. From path: {}, To path: {}, userID: {}", fromUserPath, toUserPath, userId);
             String fullFromPath = resolver.resolveFullPath(fromUserPath, userId);
             String fullToPath = resolver.resolveFullPath(toUserPath, userId);
             if (!minioHelper.objectExist(fullFromPath)) {
-                throw new DirectoryOrFileNotFound("Resource not found");
+                throw new DirectoryOrFileNotFoundException("Resource not found");
             }
             if (minioHelper.objectExist(fullToPath)) {
                 throw new DirectoryOrFileAlreadyExistException("Directory or file already exist");
@@ -43,10 +43,10 @@ public class ResourceMoveService {
             } else {
                 return renameOrMoveFile(fullFromPath, fullToPath, userId);
             }
-        } catch (InvalidPathException | DirectoryOrFileNotFound | DirectoryOrFileAlreadyExistException e) {
+        } catch (InvalidPathException | DirectoryOrFileNotFoundException | DirectoryOrFileAlreadyExistException e) {
             throw e;
         } catch (Exception e) {
-            throw new MinioIsNotAvailable("Minio is not available", e);
+            throw new MinioIsNotAvailableException("Minio is not available", e);
         }
     }
 

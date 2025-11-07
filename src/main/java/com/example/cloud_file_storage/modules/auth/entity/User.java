@@ -5,19 +5,17 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
-@Setter
 @Entity
 @Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "login", unique = true)
+    @Column(unique = true)
     private String login;
-    @Column(name = "password")
     private String password;
 }
 

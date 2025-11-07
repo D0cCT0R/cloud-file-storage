@@ -5,7 +5,7 @@ import com.example.cloud_file_storage.modules.storage.dto.storage.PathComponents
 import com.example.cloud_file_storage.modules.storage.dto.storage.ResourceType;
 import com.example.cloud_file_storage.modules.storage.exception.DirectoryOrFileAlreadyExistException;
 import com.example.cloud_file_storage.modules.storage.exception.InvalidPathException;
-import com.example.cloud_file_storage.modules.storage.exception.MinioIsNotAvailable;
+import com.example.cloud_file_storage.modules.storage.exception.MinioIsNotAvailableException;
 import com.example.cloud_file_storage.modules.storage.service.shared.*;
 import io.minio.errors.*;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,7 @@ public class DirectoryCreationService {
         this.resolver = resolver;
     }
 
-    public MinioDto createDirectory(String path, Long id) throws InvalidPathException, DirectoryOrFileAlreadyExistException {
+    public MinioDto createDirectory(String path, Long id) {
         try {
             log.info("Creating directory for user. Path: {} , userID: {}", path, id);
             String fullPath = resolver.resolveFullPath(path, id);
@@ -55,11 +55,11 @@ public class DirectoryCreationService {
         } catch (InvalidPathException | DirectoryOrFileAlreadyExistException e) {
             throw e;
         } catch (Exception e) {
-            throw new MinioIsNotAvailable("Minio is not available", e);
+            throw new MinioIsNotAvailableException("Minio is not available", e);
         }
     }
 
-    public void createUserDirectory(Long userId) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public void createUserDirectory(Long userId) throws Exception {
         String userDir = pathService.getUserFolder(userId);
         minioHelper.createDirectory(userDir);
     }
@@ -89,7 +89,7 @@ public class DirectoryCreationService {
             }
             return results;
         } catch (Exception e) {
-            throw new MinioIsNotAvailable("Minio is not available", e);
+            throw new MinioIsNotAvailableException("Minio is not available", e);
         }
     }
 }

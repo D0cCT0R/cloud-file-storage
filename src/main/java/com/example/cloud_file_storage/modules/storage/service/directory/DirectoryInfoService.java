@@ -1,7 +1,7 @@
 package com.example.cloud_file_storage.modules.storage.service.directory;
 
-import com.example.cloud_file_storage.modules.storage.exception.DirectoryOrFileNotFound;
-import com.example.cloud_file_storage.modules.storage.exception.MinioIsNotAvailable;
+import com.example.cloud_file_storage.modules.storage.exception.DirectoryOrFileNotFoundException;
+import com.example.cloud_file_storage.modules.storage.exception.MinioIsNotAvailableException;
 import com.example.cloud_file_storage.modules.storage.service.shared.*;
 import com.example.cloud_file_storage.modules.storage.dto.storage.MinioDto;
 import com.example.cloud_file_storage.modules.storage.dto.storage.PathComponents;
@@ -32,13 +32,13 @@ public class DirectoryInfoService {
         this.resolver = resolver;
     }
 
-    public List<MinioDto> getDirectoryInfo(String path, Long userId) throws DirectoryOrFileNotFound, InvalidPathException {
+    public List<MinioDto> getDirectoryInfo(String path, Long userId) {
         try {
             log.info("Starting get directory info. Path: {}, userID: {}", path, userId);
             String fullPath = resolver.resolveFullPath(path, userId);
             List<MinioDto> directoryInfo = new ArrayList<>();
             if(!minioHelper.objectExist(fullPath)) {
-                throw new DirectoryOrFileNotFound("Resource not found");
+                throw new DirectoryOrFileNotFoundException("Resource not found");
             }
             List<String> directoryPaths = minioHelper.listObjectsInDirectory(fullPath, RECURSIVE);
             log.debug("Success getting list directory objects. Path: {}, userID: {}, size: {}", path, userId, directoryPaths.size());
@@ -67,10 +67,10 @@ public class DirectoryInfoService {
             }
             log.info("Get directory info complete successfully. Path: {} , userID: {}", path, userId);
             return directoryInfo;
-        } catch (DirectoryOrFileNotFound | InvalidPathException e) {
+        } catch (DirectoryOrFileNotFoundException | InvalidPathException e) {
             throw e;
         } catch (Exception e) {
-            throw new MinioIsNotAvailable("Minio is not available", e);
+            throw new MinioIsNotAvailableException("Minio is not available", e);
         }
     }
 }
