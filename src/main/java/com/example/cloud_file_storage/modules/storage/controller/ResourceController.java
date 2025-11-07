@@ -1,9 +1,7 @@
 package com.example.cloud_file_storage.modules.storage.controller;
 
-import com.example.cloud_file_storage.infrastructure.security.CustomUserDetails;
+import com.example.cloud_file_storage.common.security.CustomUserDetails;
 import com.example.cloud_file_storage.modules.storage.dto.storage.MinioDto;
-import com.example.cloud_file_storage.modules.storage.exception.DirectoryOrFileNotFound;
-import com.example.cloud_file_storage.modules.storage.exception.InvalidPathException;
 import com.example.cloud_file_storage.modules.storage.dto.resource.DownloadResult;
 import com.example.cloud_file_storage.modules.storage.service.resource.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,9 +49,9 @@ public class ResourceController {
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @GetMapping
-    public ResponseEntity<MinioDto> getResourceInfo(@RequestParam("path") String path, @AuthenticationPrincipal CustomUserDetails user) throws DirectoryOrFileNotFound, InvalidPathException {
-        MinioDto minioDto = resourceInfoService.getResourceInfo(path, user.getId());
-        return ResponseEntity.ok(minioDto);
+    @ResponseStatus(HttpStatus.OK)
+    public MinioDto getResourceInfo(@RequestParam("path") String path, @AuthenticationPrincipal CustomUserDetails user) {
+        return resourceInfoService.getResourceInfo(path, user.getId());
     }
 
     @Operation(summary = "Delete resource", description = "Delete resource, no return", responses = {
@@ -64,9 +62,9 @@ public class ResourceController {
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @DeleteMapping
-    public ResponseEntity<?> deleteResource(@RequestParam("path") String path, @AuthenticationPrincipal CustomUserDetails user) throws Exception {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteResource(@RequestParam("path") String path, @AuthenticationPrincipal CustomUserDetails user) {
         resourceDeleteService.deleteResource(path, user.getId());
-        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Move or Rename resource", description = "Move or Rename resource and return it", responses = {
@@ -77,9 +75,9 @@ public class ResourceController {
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @GetMapping("/move")
-    public ResponseEntity<MinioDto> moveResource(@RequestParam("from") String from, @RequestParam("to") String to, @AuthenticationPrincipal CustomUserDetails user) throws Exception {
-        MinioDto minioDto = resourceMoveService.moveOrRenameResource(from, to, user.getId());
-        return ResponseEntity.ok(minioDto);
+    @ResponseStatus(HttpStatus.OK)
+    public MinioDto moveResource(@RequestParam("from") String from, @RequestParam("to") String to, @AuthenticationPrincipal CustomUserDetails user) {
+        return resourceMoveService.moveOrRenameResource(from, to, user.getId());
     }
 
     @Operation(summary = "Upload resource", description = "Upload file or directory and return uploaded files list", responses = {
@@ -90,9 +88,9 @@ public class ResourceController {
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<List<MinioDto>> uploadResource(@RequestPart("object") List<MultipartFile> files, @RequestParam("path") String path, @AuthenticationPrincipal CustomUserDetails user) throws Exception {
-        List<MinioDto> uploadFiles = uploadService.upload(path, user.getId(), files);
-        return ResponseEntity.status(HttpStatus.CREATED).body(uploadFiles);
+    @ResponseStatus(HttpStatus.CREATED)
+    public List<MinioDto> uploadResource(@RequestPart("object") List<MultipartFile> files, @RequestParam("path") String path, @AuthenticationPrincipal CustomUserDetails user) {
+        return uploadService.upload(path, user.getId(), files);
     }
 
     @Operation(summary = "Download resource", description = "Download directory or file and return StreamingResponseBody", responses = {
@@ -103,7 +101,7 @@ public class ResourceController {
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @GetMapping("/download")
-    public ResponseEntity<StreamingResponseBody> downloadResource(@RequestParam String path, @AuthenticationPrincipal CustomUserDetails user) throws InvalidPathException, DirectoryOrFileNotFound {
+    public ResponseEntity<StreamingResponseBody> downloadResource(@RequestParam String path, @AuthenticationPrincipal CustomUserDetails user) {
         DownloadResult object = resourceDownloadService.downloadResource(path, user.getId());
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -119,8 +117,10 @@ public class ResourceController {
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @GetMapping("/search")
-    public ResponseEntity<List<MinioDto>> searchResource(@RequestParam String query, @AuthenticationPrincipal CustomUserDetails user) {
-        List<MinioDto> searchResult = resourceSearchService.search(query, user.getId());
-        return ResponseEntity.ok(searchResult);
+    @ResponseStatus(HttpStatus.OK)
+    public List<MinioDto> searchResource(@RequestParam String query, @AuthenticationPrincipal CustomUserDetails user) {
+        return resourceSearchService.search(query, user.getId());
     }
 }
+
+

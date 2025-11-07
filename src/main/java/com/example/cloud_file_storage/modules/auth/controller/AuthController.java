@@ -17,17 +17,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 @Tag(name = "Auth API", description = "Authorization")
-@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -46,9 +42,9 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @PostMapping("/sign-up")
-    public ResponseEntity<?> signUp(@Valid @RequestBody AuthRequest request, HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws UserAlreadyExistException, IncorrectLoginOrPasswordException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, FailInitializeUserRootDirectory, InternalException {
-        AuthResponse response = authService.signUp(request, servletRequest, servletResponse);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    @ResponseStatus(HttpStatus.CREATED)
+    public AuthResponse signUp(@Valid @RequestBody AuthRequest request, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+        return authService.signUp(request, servletRequest, servletResponse);
     }
 
     @Operation(summary = "Authentication", description = "Authenticate user", responses = {
@@ -58,8 +54,11 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @PostMapping("/sign-in")
-    public ResponseEntity<?> signIn(@Valid @RequestBody AuthRequest request, HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws IncorrectLoginOrPasswordException {
+    @ResponseStatus(HttpStatus.OK)
+    public AuthResponse signIn(@Valid @RequestBody AuthRequest request, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
         authService.login(request, servletRequest, servletResponse);
-        return ResponseEntity.ok(new AuthResponse(request.username()));
+        return new AuthResponse(request.username());
     }
 }
+
+

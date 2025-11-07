@@ -1,4 +1,4 @@
-package com.example.cloud_file_storage.infrastructure.config;
+package com.example.cloud_file_storage.common.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
@@ -21,3 +21,4 @@ public class OpenApiConfig {
                                 .email("ershov.2004416@gmail.com")));
     }
 }
+

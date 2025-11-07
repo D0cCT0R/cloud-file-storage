@@ -13,3 +13,5 @@ public class UserRegisteredEvent extends ApplicationEvent {
         this.userId = userId;
     }
 }
+
+

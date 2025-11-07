@@ -1,8 +1,7 @@
 package com.example.cloud_file_storage.modules.storage.service.resource;
-
 import com.example.cloud_file_storage.modules.storage.exception.DirectoryOrFileAlreadyExistException;
 import com.example.cloud_file_storage.modules.storage.exception.InvalidPathException;
-import com.example.cloud_file_storage.modules.storage.exception.MinioIsNotAvailable;
+import com.example.cloud_file_storage.modules.storage.exception.MinioIsNotAvailableException;
 import com.example.cloud_file_storage.modules.storage.dto.storage.MinioDto;
 import com.example.cloud_file_storage.modules.storage.dto.storage.PathComponents;
 import com.example.cloud_file_storage.modules.storage.dto.storage.ResourceType;
@@ -13,11 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 import java.io.InputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,12 +35,9 @@ public class ResourceUploadService {
         this.validationService = validationService;
     }
 
-    public List<MinioDto> upload(String path, Long id, List<MultipartFile> files) throws Exception {
+    public List<MinioDto> upload(String path, Long id, List<MultipartFile> files) {
         try {
             log.info("Upload user resource. Path: {}, userID: {}", path, id);
-            if (files.isEmpty()) {
-                throw new Exception("Upload error");
-            }
             validationService.validateUserPath(path);
             String normalizedUserPath = resolverService.normalizeUserPath(path);
             String firstComponent = resolverService.extractFirstComponent(files.get(0).getOriginalFilename());
@@ -62,11 +54,11 @@ public class ResourceUploadService {
             throw e;
         }
         catch (Exception e) {
-            throw new MinioIsNotAvailable("Minio is not available", e);
+            throw new MinioIsNotAvailableException("Minio is not available", e);
         }
     }
 
-    private List<MinioDto> uploadFile(String fullFilePathToUpload, InputStream fileInputStream, Long fileSize, Long id) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    private List<MinioDto> uploadFile(String fullFilePathToUpload, InputStream fileInputStream, Long fileSize, Long id) throws Exception {
         List<MinioDto> uploadedFiles = new ArrayList<>();
         helper.putObject(fullFilePathToUpload, fileInputStream, fileSize);
         String relativePath = resolverService.getRelativePath(id, fullFilePathToUpload);
@@ -81,7 +73,7 @@ public class ResourceUploadService {
         return uploadedFiles;
     }
 
-    private List<MinioDto> uploadDirectory(List<MultipartFile> files, Long id, String normalizedUserPath) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    private List<MinioDto> uploadDirectory(List<MultipartFile> files, Long id, String normalizedUserPath) throws Exception {
         List<MinioDto> uploadedFiles = new ArrayList<>();
         for (MultipartFile file : files) {
             List<MinioDto> directories = createService.createParentDirectories(file.getOriginalFilename(), normalizedUserPath, id);
@@ -102,3 +94,5 @@ public class ResourceUploadService {
         return uploadedFiles;
     }
 }
+
+

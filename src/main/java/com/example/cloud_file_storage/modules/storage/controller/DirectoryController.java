@@ -1,25 +1,20 @@
 package com.example.cloud_file_storage.modules.storage.controller;
 
-import com.example.cloud_file_storage.infrastructure.security.CustomUserDetails;
-import com.example.cloud_file_storage.modules.storage.exception.DirectoryOrFileAlreadyExistException;
-import com.example.cloud_file_storage.modules.storage.exception.DirectoryOrFileNotFound;
+import com.example.cloud_file_storage.common.security.CustomUserDetails;
 import com.example.cloud_file_storage.modules.storage.service.directory.DirectoryCreationService;
 import com.example.cloud_file_storage.modules.storage.service.directory.DirectoryInfoService;
 import com.example.cloud_file_storage.modules.storage.dto.storage.MinioDto;
-import com.example.cloud_file_storage.modules.storage.exception.InvalidPathException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @Tag(name = "Directory API", description = "Creating directory and getting directory content")
-@Slf4j
 @RestController
 @RequestMapping("/api/directory")
 public class DirectoryController {
@@ -40,10 +35,10 @@ public class DirectoryController {
             @ApiResponse(responseCode = "404", description = "Directory not found"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
-    @GetMapping()
-    public ResponseEntity<List<MinioDto>> getDirectoryContent(@RequestParam String path, @AuthenticationPrincipal CustomUserDetails user) throws InvalidPathException, DirectoryOrFileNotFound {
-        List<MinioDto> directoryContent = directoryInfoService.getDirectoryInfo(path, user.getId());
-        return ResponseEntity.ok().body(directoryContent);
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public List<MinioDto> getDirectoryContent(@RequestParam String path, @AuthenticationPrincipal CustomUserDetails user) {
+        return directoryInfoService.getDirectoryInfo(path, user.getId());
     }
 
     @Operation(summary = "Create directory", description = "Create directory and return it", responses = {
@@ -55,8 +50,10 @@ public class DirectoryController {
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @PostMapping
-    public ResponseEntity<MinioDto> createFolder(@RequestParam String path, @AuthenticationPrincipal CustomUserDetails user) throws DirectoryOrFileAlreadyExistException, InvalidPathException {
-        MinioDto directory = directoryCreationService.createDirectory(path, user.getId());
-        return ResponseEntity.ok(directory);
+    @ResponseStatus(HttpStatus.CREATED)
+    public MinioDto createFolder(@RequestParam String path, @AuthenticationPrincipal CustomUserDetails user) {
+        return directoryCreationService.createDirectory(path, user.getId());
     }
 }
+
+

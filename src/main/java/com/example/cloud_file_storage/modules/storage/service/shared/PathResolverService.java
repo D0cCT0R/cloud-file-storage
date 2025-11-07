@@ -12,6 +12,13 @@ import java.util.List;
 public class PathResolverService {
 
     private final UserPathService pathService;
+    private static final String ROOT_PATH = "/";
+    private static final String EMPTY_STRING = "";
+    private static final String DIRECTORY_SEPARATOR = "/";
+    private static final int NOT_FOUND = -1;
+    private static final int START_INDEX = 0;
+    private static final int SINGLE_CHARACTER = 1;
+    private static final int DIRECTORY_SUFFIX_LENGTH = 1;
 
     @Autowired
     public PathResolverService(UserPathService pathService) {
@@ -20,36 +27,39 @@ public class PathResolverService {
 
     public String normalizeUserPath(String userPath) {
         String normalized = userPath;
-        if(normalized.startsWith("/")) {
-            normalized = normalized.substring(1);
+        if (normalized.startsWith(DIRECTORY_SEPARATOR)) {
+            normalized = normalized.substring(SINGLE_CHARACTER);
         }
         return normalized;
     }
 
     public PathComponents extractPathComponents(String userPath) {
         if (userPath.isEmpty()) {
-            return new PathComponents("/", "");
+            return new PathComponents(ROOT_PATH, EMPTY_STRING);
         }
+
         String path = userPath;
-        if (path.startsWith("/")) {
-            path = path.substring(1);
+        if (path.startsWith(DIRECTORY_SEPARATOR)) {
+            path = path.substring(SINGLE_CHARACTER);
         }
-        boolean isDirectory = path.endsWith("/");
-        if (isDirectory && path.length() > 1) {
-            path = path.substring(0, path.length() - 1);
+
+        boolean isDirectory = path.endsWith(DIRECTORY_SEPARATOR);
+        if (isDirectory && path.length() > SINGLE_CHARACTER) {
+            path = path.substring(START_INDEX, path.length() - DIRECTORY_SUFFIX_LENGTH);
         }
-        int lastSlashIndex = path.lastIndexOf('/');
-        if (lastSlashIndex == -1) {
+
+        int lastSlashIndex = path.lastIndexOf(DIRECTORY_SEPARATOR);
+        if (lastSlashIndex == NOT_FOUND) {
             if (isDirectory) {
-                return new PathComponents("/", path + "/");
+                return new PathComponents(ROOT_PATH, path + DIRECTORY_SEPARATOR);
             } else {
-                return new PathComponents("/", path);
+                return new PathComponents(ROOT_PATH, path);
             }
         } else {
-            String parentPath = path.substring(0, lastSlashIndex) + "/";
-            String name = path.substring(lastSlashIndex + 1);
+            String parentPath = path.substring(START_INDEX, lastSlashIndex) + DIRECTORY_SEPARATOR;
+            String name = path.substring(lastSlashIndex + SINGLE_CHARACTER);
             if (isDirectory) {
-                name += "/";
+                name += DIRECTORY_SEPARATOR;
             }
             return new PathComponents(parentPath, name);
         }
@@ -68,27 +78,30 @@ public class PathResolverService {
     }
 
     public String extractFileName(String relativePath) {
-        int lastSlash = relativePath.lastIndexOf('/');
-        return (lastSlash == -1) ? relativePath : relativePath.substring(lastSlash + 1);
+        int lastSlash = relativePath.lastIndexOf(DIRECTORY_SEPARATOR);
+        return (lastSlash == NOT_FOUND) ? relativePath : relativePath.substring(lastSlash + SINGLE_CHARACTER);
     }
 
     public String extractFolderName(String relativePath) {
-        if (relativePath == null || relativePath.isEmpty() || relativePath.equals("/")) {
-            return "";
+        if (relativePath == null || relativePath.isEmpty() || relativePath.equals(ROOT_PATH)) {
+            return EMPTY_STRING;
         }
-        String normalizedPath = relativePath.endsWith("/") ? relativePath : relativePath + "/";
-        String path = normalizedPath.substring(0, normalizedPath.length() - 1);
-        int lastSlash = path.lastIndexOf('/');
-        if (lastSlash == -1) {
+
+        String normalizedPath = relativePath.endsWith(DIRECTORY_SEPARATOR) ? relativePath : relativePath + DIRECTORY_SEPARATOR;
+        String path = normalizedPath.substring(START_INDEX, normalizedPath.length() - DIRECTORY_SUFFIX_LENGTH);
+        int lastSlash = path.lastIndexOf(DIRECTORY_SEPARATOR);
+
+        if (lastSlash == NOT_FOUND) {
             return path;
         } else {
-            return path.substring(lastSlash + 1);
+            return path.substring(lastSlash + SINGLE_CHARACTER);
         }
     }
 
     public String extractFirstComponent(String path) {
-        int firstSlash = path.indexOf('/');
-        return firstSlash != -1 ? path.substring(0, firstSlash + 1) : path;
+        int firstSlash = path.indexOf(DIRECTORY_SEPARATOR);
+        return firstSlash != NOT_FOUND ? path.substring(START_INDEX, firstSlash + SINGLE_CHARACTER) : path;
     }
-
 }
+
+

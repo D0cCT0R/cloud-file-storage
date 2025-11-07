@@ -1,4 +1,4 @@
-package com.example.cloud_file_storage.infrastructure.config;
+package com.example.cloud_file_storage.common.config;
 
 
 import org.springframework.context.annotation.Bean;
@@ -15,3 +15,5 @@ public class RedisSessionConfig {
         return new JdkSerializationRedisSerializer();
     }
 }
+
+

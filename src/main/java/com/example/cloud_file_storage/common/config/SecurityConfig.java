@@ -1,7 +1,7 @@
-package com.example.cloud_file_storage.infrastructure.config;
+package com.example.cloud_file_storage.common.config;
 
 
-import com.example.cloud_file_storage.infrastructure.security.CustomUserDetails;
+import com.example.cloud_file_storage.common.security.CustomUserDetails;
 import com.example.cloud_file_storage.modules.auth.entity.User;
 import com.example.cloud_file_storage.modules.auth.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -114,3 +114,5 @@ public class SecurityConfig {
         return source;
     }
 }
+
+

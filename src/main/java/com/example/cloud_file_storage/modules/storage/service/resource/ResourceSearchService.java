@@ -1,7 +1,7 @@
 package com.example.cloud_file_storage.modules.storage.service.resource;
 
 
-import com.example.cloud_file_storage.modules.storage.exception.MinioIsNotAvailable;
+import com.example.cloud_file_storage.modules.storage.exception.MinioIsNotAvailableException;
 import com.example.cloud_file_storage.modules.storage.service.shared.MinioHelper;
 import com.example.cloud_file_storage.modules.storage.dto.storage.MinioDto;
 import com.example.cloud_file_storage.modules.storage.dto.storage.PathComponents;
@@ -9,14 +9,10 @@ import com.example.cloud_file_storage.modules.storage.dto.storage.ResourceType;
 import com.example.cloud_file_storage.modules.storage.service.shared.PathResolverService;
 import com.example.cloud_file_storage.modules.storage.service.shared.UserPathService;
 import io.minio.StatObjectResponse;
-import io.minio.errors.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,7 +69,9 @@ public class ResourceSearchService {
             log.debug("Search complete successfully. Query: {}, userID: {}, size: {}", query, userId, searchResults.size());
             return searchResults;
         } catch (Exception e) {
-            throw new MinioIsNotAvailable("Minio is not available", e);
+            throw new MinioIsNotAvailableException("Minio is not available", e);
         }
     }
 }
+
+
