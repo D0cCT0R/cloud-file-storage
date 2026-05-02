@@ -2,8 +2,8 @@ package com.example.cloud_file_storage.common.config;
 
 
 import com.example.cloud_file_storage.common.security.CustomUserDetails;
-import com.example.cloud_file_storage.modules.auth.entity.User;
-import com.example.cloud_file_storage.modules.auth.repository.UserRepository;
+import com.example.cloud_file_storage.entity.User;
+import com.example.cloud_file_storage.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -58,7 +58,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(
+        public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
@@ -73,6 +73,7 @@ public class SecurityConfig {
         return http.
                 authorizeHttpRequests(auth ->
                         auth
+                                .requestMatchers("/actuator/prometheus").permitAll()
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/static/**", "/assets/**", "/**.js", "/**.css").permitAll()
@@ -108,7 +109,6 @@ public class SecurityConfig {
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
         corsConfiguration.setAllowCredentials(true);
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);
         return source;

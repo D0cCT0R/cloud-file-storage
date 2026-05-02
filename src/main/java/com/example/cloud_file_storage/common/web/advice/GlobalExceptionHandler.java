@@ -1,9 +1,9 @@
 package com.example.cloud_file_storage.common.web.advice;
 
 
-import com.example.cloud_file_storage.modules.auth.exception.IncorrectLoginOrPasswordException;
-import com.example.cloud_file_storage.modules.auth.exception.UserAlreadyExistException;
-import com.example.cloud_file_storage.modules.storage.exception.*;
+import com.example.cloud_file_storage.exception.storage.*;
+import com.example.cloud_file_storage.exception.auth.IncorrectLoginOrPasswordException;
+import com.example.cloud_file_storage.exception.auth.UserAlreadyExistException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.HttpStatus;
