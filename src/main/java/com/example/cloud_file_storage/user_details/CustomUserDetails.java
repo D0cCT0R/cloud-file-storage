@@ -1,4 +1,4 @@
-package com.example.cloud_file_storage.common.security;
+package com.example.cloud_file_storage.user_details;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

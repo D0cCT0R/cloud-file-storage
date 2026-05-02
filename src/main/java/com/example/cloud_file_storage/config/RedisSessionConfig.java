@@ -1,4 +1,4 @@
-package com.example.cloud_file_storage.common.config;
+package com.example.cloud_file_storage.config;
 
 
 import org.springframework.context.annotation.Bean;

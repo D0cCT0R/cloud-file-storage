@@ -1,4 +1,4 @@
-package com.example.cloud_file_storage.common.config;
+package com.example.cloud_file_storage.config;
 
 import com.example.cloud_file_storage.exception.storage.InitializeBucketException;
 import io.minio.BucketExistsArgs;

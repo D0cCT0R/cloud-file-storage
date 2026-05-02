@@ -1,7 +1,7 @@
-package com.example.cloud_file_storage.common.config;
+package com.example.cloud_file_storage.config;
 
 
-import com.example.cloud_file_storage.common.security.CustomUserDetails;
+import com.example.cloud_file_storage.user_details.CustomUserDetails;
 import com.example.cloud_file_storage.entity.User;
 import com.example.cloud_file_storage.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;

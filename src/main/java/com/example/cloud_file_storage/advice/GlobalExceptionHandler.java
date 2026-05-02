@@ -1,4 +1,4 @@
-package com.example.cloud_file_storage.common.web.advice;
+package com.example.cloud_file_storage.advice;
 
 
 import com.example.cloud_file_storage.exception.storage.*;

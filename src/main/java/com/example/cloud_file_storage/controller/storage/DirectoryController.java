@@ -1,6 +1,6 @@
 package com.example.cloud_file_storage.controller.storage;
 
-import com.example.cloud_file_storage.common.security.CustomUserDetails;
+import com.example.cloud_file_storage.user_details.CustomUserDetails;
 import com.example.cloud_file_storage.service.storage.directory.DirectoryCreationService;
 import com.example.cloud_file_storage.service.storage.directory.DirectoryInfoService;
 import com.example.cloud_file_storage.dto.storage.MinioDto;
