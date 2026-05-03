@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
-      - uses: actions/checkout@v4          # ← добавили
+      - uses: actions/checkout@v4
 
       - name: Set lowercase repository name for deploy
         id: lowercase_repo
