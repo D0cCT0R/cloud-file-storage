@@ -71,7 +71,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "docker-compose/docker-compose.yml,docker-compose/prometheus.yml,docker-compose/logstash"
           target: "/opt/myapp/"
-          strip_components: 1    # уберёт папку docker-compose, файлы лягут прямо в /opt/myapp/
+          strip_components: 1
 
       - name: Deploy with Docker Compose
         uses: appleboy/ssh-action@v1

@@ -89,7 +89,7 @@ services:
     networks:
       - elk
   app:
-    image: ghcr.io/D0cCT0R/cloud-file-storage:latest
+    image: ghcr.io/d0cct0r/cloud-file-storage:latest
     restart: always
     ports:
       - "8080:8080"
