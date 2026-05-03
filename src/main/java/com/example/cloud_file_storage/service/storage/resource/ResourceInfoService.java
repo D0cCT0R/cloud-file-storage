@@ -62,6 +62,7 @@ public class ResourceInfoService {
                 ResourceType.FILE
         );
     }
+
     @WithSpan
     private MinioDto getDirectoryInfo(String fullPath, Long id) {
         String relativePath = resolverService.getRelativePath(id, fullPath);

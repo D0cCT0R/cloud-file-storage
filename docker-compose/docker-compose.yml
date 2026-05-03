@@ -37,7 +37,7 @@ services:
   jaeger:
     image: jaegertracing/all-in-one:latest
     ports:
-      - "16686:16686" #UI compose
+      - "16686:16686" #UI
       - "4318:4318" #HTTP
   prometheus:
     image: prom/prometheus:latest

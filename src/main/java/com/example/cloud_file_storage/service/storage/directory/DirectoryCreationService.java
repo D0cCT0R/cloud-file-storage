@@ -26,6 +26,7 @@ public class DirectoryCreationService {
     private final PathResolverService resolverService;
     private final UserPathService pathService;
     private final UserPathResolver resolver;
+
     @Autowired
     public DirectoryCreationService(MinioHelper minioHelper, PathResolverService resolverService, UserPathService pathService, UserPathResolver resolver) {
         this.minioHelper = minioHelper;
@@ -33,6 +34,7 @@ public class DirectoryCreationService {
         this.pathService = pathService;
         this.resolver = resolver;
     }
+
     @WithSpan
     public MinioDto createDirectory(String path, Long id) {
         try {
