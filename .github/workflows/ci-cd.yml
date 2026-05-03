@@ -56,19 +56,22 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
+      - uses: actions/checkout@v4          # ← добавили
+
+      - name: Set lowercase repository name for deploy
+        id: lowercase_repo
+        run: |
+          echo "REPO_NAME=$(echo '${{ github.repository }}' | tr 'A-Z' 'a-z')" >> $GITHUB_OUTPUT
+
       - name: Copy stack files to server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "cloud-file-storage/docker-compose/docker-compose.yml,cloud-file-storage/docker-compose/prometheus.yml,cloud-file-storage/docker-compose/logstash"
+          source: "docker-compose/docker-compose.yml,docker-compose/prometheus.yml,docker-compose/logstash"
           target: "/opt/myapp/"
-          strip_components: 2
-      - name: Set lowercase repository name for deploy
-        id: lowercase_repo
-        run: |
-          echo "REPO_NAME=$(echo '${{ github.repository }}' | tr 'A-Z' 'a-z')" >> $GITHUB_OUTPUT
+          strip_components: 1    # уберёт папку docker-compose, файлы лягут прямо в /opt/myapp/
 
       - name: Deploy with Docker Compose
         uses: appleboy/ssh-action@v1
