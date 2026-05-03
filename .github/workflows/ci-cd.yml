@@ -31,18 +31,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set lowercase repository name
+        id: lowercase_repo
+        run: |
+          echo "REPO_NAME=$(echo '${{ github.repository }}' | tr 'A-Z' 'a-z')" >> $GITHUB_OUTPUT
+
       - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository }}:latest
+          tags: ghcr.io/${{ steps.lowercase_repo.outputs.REPO_NAME }}:latest
 
   deploy:
     needs: docker-build-push
@@ -58,6 +65,10 @@ jobs:
           source: "cloud-file-storage/docker-compose/docker-compose.yml,cloud-file-storage/docker-compose/prometheus.yml,cloud-file-storage/docker-compose/logstash"
           target: "/opt/myapp/"
           strip_components: 2
+      - name: Set lowercase repository name for deploy
+        id: lowercase_repo
+        run: |
+          echo "REPO_NAME=$(echo '${{ github.repository }}' | tr 'A-Z' 'a-z')" >> $GITHUB_OUTPUT
 
       - name: Deploy with Docker Compose
         uses: appleboy/ssh-action@v1
@@ -75,5 +86,5 @@ jobs:
             MINIO_ROOT_PASSWORD=${{ secrets.MINIO_ROOT_PASSWORD }}
             REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
             EOF
-            docker pull ghcr.io/${{ github.repository }}:latest
+            docker pull ghcr.io/${{ steps.lowercase_repo.outputs.REPO_NAME }}:latest
             docker compose up -d --force-recreate
