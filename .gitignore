@@ -23,7 +23,6 @@ buildNumber.properties
 *.log
 logs/
 
-application*.properties
 !application*.properties.example
 application*.yml
 !application*.yml.example
@@ -41,7 +40,6 @@ application*.yaml
 .env
 
 .dockerignore
-Dockerfile
 !docker-compose/docker-compose.yml
 
 /.springcloud/

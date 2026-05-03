@@ -1,0 +1,91 @@
+package com.example.cloud_file_storage.service.storage.resource;
+
+import com.example.cloud_file_storage.exception.storage.DirectoryOrFileAlreadyExistException;
+import com.example.cloud_file_storage.exception.storage.DirectoryOrFileNotFoundException;
+import com.example.cloud_file_storage.exception.storage.InvalidPathException;
+import com.example.cloud_file_storage.exception.storage.MinioIsNotAvailableException;
+import com.example.cloud_file_storage.dto.storage.MinioDto;
+import com.example.cloud_file_storage.dto.storage.PathComponents;
+import com.example.cloud_file_storage.dto.storage.ResourceType;
+import com.example.cloud_file_storage.util.MinioHelper;
+import com.example.cloud_file_storage.util.PathResolverService;
+import com.example.cloud_file_storage.util.UserPathResolver;
+import io.minio.*;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import java.util.List;
+
+
+@Service
+@Slf4j
+public class ResourceMoveService {
+    private final MinioHelper minioHelper;
+    private final PathResolverService resolverService;
+    private final UserPathResolver resolver;
+    private final boolean RECURSIVE = true;
+
+    public ResourceMoveService(MinioHelper minioHelper,
+                               PathResolverService resolverService, UserPathResolver resolver) {
+        this.minioHelper = minioHelper;
+        this.resolverService = resolverService;
+        this.resolver = resolver;
+    }
+    @WithSpan
+    public MinioDto moveOrRenameResource(String fromUserPath, String toUserPath, Long userId) {
+        try {
+            log.info("Move or Rename resource. From path: {}, To path: {}, userID: {}", fromUserPath, toUserPath, userId);
+            String fullFromPath = resolver.resolveFullPath(fromUserPath, userId);
+            String fullToPath = resolver.resolveFullPath(toUserPath, userId);
+            if (!minioHelper.objectExist(fullFromPath)) {
+                throw new DirectoryOrFileNotFoundException("Resource not found");
+            }
+            if (minioHelper.objectExist(fullToPath)) {
+                throw new DirectoryOrFileAlreadyExistException("Directory or file already exist");
+            }
+            if (minioHelper.isDirectory(fullFromPath) && minioHelper.isDirectory(fullToPath)) {
+                return renameOrMoveDirectory(fullFromPath, fullToPath, userId);
+            } else {
+                return renameOrMoveFile(fullFromPath, fullToPath, userId);
+            }
+        } catch (InvalidPathException | DirectoryOrFileNotFoundException | DirectoryOrFileAlreadyExistException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new MinioIsNotAvailableException("Minio is not available", e);
+        }
+    }
+    @WithSpan
+    private MinioDto renameOrMoveFile(String fullFromPath, String fullToPath, Long id) throws Exception {
+        minioHelper.copyObject(fullToPath, fullFromPath);
+        minioHelper.removeObject(fullFromPath);
+        StatObjectResponse stat = minioHelper.statObject(fullToPath);
+        String relativeToPath = resolverService.getRelativePath(id, fullToPath);
+        PathComponents toComponents = resolverService.extractPathComponents(relativeToPath);
+        log.debug("Move or Rename file complete successfully. Path: {}, userID: {}", fullToPath, id);
+        return MinioDto.builder()
+                .path(toComponents.parentPath())
+                .name(toComponents.name())
+                .size(stat.size())
+                .type(ResourceType.FILE)
+                .build();
+    }
+    @WithSpan
+    private MinioDto renameOrMoveDirectory(String fullFromPath, String fullToPath, Long id) throws Exception {
+        List<String> objectsToMove = minioHelper.listObjectsInDirectory(fullFromPath, RECURSIVE);
+        for (String sourceObject : objectsToMove) {
+            String targetObject = sourceObject.replace(fullFromPath, fullToPath);
+            minioHelper.copyObject(targetObject, sourceObject);
+        }
+        String relativeToPath = resolverService.getRelativePath(id, fullToPath);
+        PathComponents toComponents = resolverService.extractPathComponents(relativeToPath);
+        minioHelper.removeObjects(objectsToMove);
+        log.debug("Rename of Move directory complete successfully. Path: {}, userID: {}", fullToPath, id);
+        return MinioDto.builder()
+                .path(toComponents.parentPath())
+                .name(toComponents.name())
+                .type(ResourceType.DIRECTORY)
+                .build();
+    }
+}
+
+
