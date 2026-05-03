@@ -41,7 +41,6 @@ application*.yaml
 .env
 
 .dockerignore
-Dockerfile
 !docker-compose/docker-compose.yml
 
 /.springcloud/
