@@ -24,7 +24,7 @@ jobs:
       - name: Make mvnw executable
         run: chmod +x mvnw
       - name: Run Tests
-        run: ./mvnw package -DskiptTests
+        run: ./mvnw package -DskipTests
 
   docker-build-push:
     needs: test
